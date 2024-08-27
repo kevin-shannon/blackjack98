@@ -10,7 +10,7 @@ interface ActionButtonProps {
 const ActionButton: React.FC<ActionButtonProps> = ({ action, onClick }) => {
   return (
     <button className="action-button" onClick={onClick}>
-      <img src={action.src} alt={action.alt} className="action-button-img" />
+      <img src={action.src} alt={action.actionName} className="action-button-img" />
     </button>
   );
 };
