@@ -1,0 +1,9 @@
+.action-panel {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+}
+
+.action-panel-row {
+  display: flex;
+}

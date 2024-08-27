@@ -1,0 +1,6 @@
+@import url("./etc/variables.css");
+
+.window-body {
+  position: relative;
+  image-rendering: pixelated;
+}

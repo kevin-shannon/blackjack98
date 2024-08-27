@@ -1,0 +1,18 @@
+:root {
+  --primary-red: #fc0000;
+  --primary-green: #00fc00;
+  --primary-blue: #0000fc;
+  --primary-cyan: #00fcfc;
+  --primary-magenta: #fc00fc;
+  --primary-yellow: #fcfc00;
+  --primary-seafoam: #54a8a8;
+  --primary-maroon: #a80054;
+  --primary-jade: #00a854;
+  --primary-purple: #a854a8;
+  --primary-navy: #0000a8;
+  --primary-black: #000000;
+  --primary-smoke: #84888c;
+  --primary-silver: #c0c4c8;
+  --primary-white: #fcfcfc;
+  --primary-brass: #a8a854;
+}
