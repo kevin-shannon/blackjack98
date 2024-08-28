@@ -1,29 +1,30 @@
+import React from "react";
 import "./ActionPanel.css";
 import "98.css";
-import { actions } from "../../enums";
+import { Action } from "../../enums";
 import ActionButton from "./ActionButton";
 
-function ActionPanel() {
+interface ActionPanelProps {
+  resolveAction: (action: Action) => void;
+}
+
+const ActionPanel: React.FC<ActionPanelProps> = ({ resolveAction }) => {
   return (
     <div className="action-panel">
       <div className="action-panel-row">
-        <div className="action-panel">
-          <div className="action-panel-row">
-            <ActionButton action={actions[0]} />
-            <ActionButton action={actions[1]} />
-          </div>
-          <div className="action-panel-row">
-            <ActionButton action={actions[2]} />
-            <ActionButton action={actions[3]} />
-          </div>
-          <div className="action-panel-row">
-            <ActionButton action={actions[4]} />
-            <ActionButton action={actions[5]} />
-          </div>
-        </div>
+        <ActionButton action={Action.DOUBLE} src={"2x.png"} resolveAction={resolveAction} />
+        <ActionButton action={Action.SURRENDER} src={"surrender.png"} resolveAction={resolveAction} />
+      </div>
+      <div className="action-panel-row">
+        <ActionButton action={Action.HIT} src={"hit.png"} resolveAction={resolveAction} />
+        <ActionButton action={Action.SPLIT} src={"split.png"} resolveAction={resolveAction} />
+      </div>
+      <div className="action-panel-row">
+        <ActionButton action={Action.STAND} src={"stand.png"} resolveAction={resolveAction} />
+        <ActionButton action={Action.INSURANCE} src={"insurance.png"} resolveAction={resolveAction} />
       </div>
     </div>
   );
-}
+};
 
 export default ActionPanel;

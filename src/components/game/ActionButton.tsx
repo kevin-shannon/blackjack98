@@ -4,14 +4,20 @@ import { Action } from "../../enums";
 
 interface ActionButtonProps {
   action: Action;
-  onClick?: () => void;
+  src: string;
+  resolveAction: (action: Action) => void;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({ action, onClick }) => {
+const ActionButton: React.FC<ActionButtonProps> = ({ action, src, resolveAction }) => {
+  const handleClick = () => {
+    resolveAction(action);
+  };
+
   return (
-    <button className="action-button" onClick={onClick}>
-      <img src={action.src} alt={action.actionName} className="action-button-img" />
+    <button className="action-button" onClick={handleClick}>
+      <img src={src} alt={action} className="action-button-img" />
     </button>
   );
 };
+
 export default ActionButton;

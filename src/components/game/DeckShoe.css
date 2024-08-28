@@ -1,0 +1,17 @@
+.deck-shoe {
+  position: absolute;
+  top: 8px;
+  left: 11px;
+}
+
+.middle-deck-shoe-card {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+}
+
+.top-deck-shoe-card {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+}

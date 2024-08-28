@@ -1,25 +1,24 @@
 import React, { useState } from "react";
 import "./PlayingCard.css";
 import "98.css";
-import { Suit, Rank } from "../../enums";
+import { Card } from "../../enums";
 
 interface PlayingCardProps {
-  suit: Suit;
-  rank: Rank;
+  card: Card;
   isFaceUp: boolean;
 }
 
-const PlayingCard: React.FC<PlayingCardProps> = ({ suit, rank, isFaceUp }) => {
+const PlayingCard: React.FC<PlayingCardProps> = ({ card, isFaceUp }) => {
   const [faceUp, setFaceUp] = useState(isFaceUp);
 
-  const cardImage = faceUp ? `cards/${suit}_${rank}.png` : "cards/backs/card_back.png";
+  const cardImage = faceUp ? `cards/${card.suit}_${card.rank}.png` : "cards/backs/card_back.png";
 
   const toggleCard = () => {
     setFaceUp(!faceUp);
   };
 
   return (
-    <div className="playing-card" onClick={toggleCard}>
+    <div className="playing-card" onClick={() => {}}>
       <img src={cardImage} />
     </div>
   );
