@@ -9,7 +9,7 @@ interface PlayingCardProps {
 }
 
 function PlayingCard({ card, isFaceUp }: PlayingCardProps) {
-  const [faceUp, setFaceUp] = useState(isFaceUp);
+  const [faceUp] = useState(isFaceUp);
 
   const cardImage = faceUp ? `cards/${card.suit}_${card.rank}.png` : "cards/backs/card_back.png";
 
