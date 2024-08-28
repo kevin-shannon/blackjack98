@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ActionPanel from "./ActionPanel";
 import DeckShoe from "./DeckShoe";
 import { Action } from "../../enums";
@@ -6,8 +6,9 @@ import "./Game.css";
 import "98.css";
 import { BlackjackGame } from "../../blackjack";
 
-const Game: React.FC = () => {
+function Game() {
   const [actionPromise, setActionPromise] = useState<(action: Action) => void | null>();
+  const [game, setGame] = useState<BlackjackGame | null>(null);
 
   const waitForPlayerAction = (): Promise<Action> => {
     return new Promise<Action>((resolve) => {
@@ -21,7 +22,10 @@ const Game: React.FC = () => {
     }
   };
 
-  const game = new BlackjackGame(1, waitForPlayerAction);
+  useEffect(() => {
+    const newGame = new BlackjackGame(1, waitForPlayerAction);
+    setGame(newGame);
+  }, []);
 
   return (
     <div style={{ width: 500, height: 500, backgroundColor: "var(--primary-jade)" }}>
@@ -29,6 +33,6 @@ const Game: React.FC = () => {
       <DeckShoe game={game} />
     </div>
   );
-};
+}
 
 export default Game;

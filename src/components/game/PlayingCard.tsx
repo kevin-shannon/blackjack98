@@ -8,7 +8,7 @@ interface PlayingCardProps {
   isFaceUp: boolean;
 }
 
-const PlayingCard: React.FC<PlayingCardProps> = ({ card, isFaceUp }) => {
+function PlayingCard({ card, isFaceUp }: PlayingCardProps) {
   const [faceUp, setFaceUp] = useState(isFaceUp);
 
   const cardImage = faceUp ? `cards/${card.suit}_${card.rank}.png` : "cards/backs/card_back.png";
@@ -22,6 +22,6 @@ const PlayingCard: React.FC<PlayingCardProps> = ({ card, isFaceUp }) => {
       <img src={cardImage} />
     </div>
   );
-};
+}
 
 export default PlayingCard;

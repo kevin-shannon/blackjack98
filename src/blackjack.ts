@@ -61,12 +61,18 @@ export class BlackjackGame {
   }
 
   async startGame(): Promise<void> {
+    this.scoop();
     this.dealPlayerHand();
     this.dealDealerHand();
-    await this.playPlayerTurn(); // Await the player's turn to complete
+    await this.playPlayerTurn();
     if (!this.player.isBusted()) {
       this.playDealerTurn();
     }
+  }
+
+  scoop(): void {
+    this.player.toss();
+    this.dealer.toss();
   }
 
   dealPlayerHand(): void {
@@ -90,7 +96,7 @@ export class BlackjackGame {
   // Method to handle the player's turn
   private async playPlayerTurn(): Promise<void> {
     console.log("Player's hand:", this.player.getHand(), this.player.getValue());
-    console.log("Dealer's hand:", this.dealer.getHand(), this.dealer.getValue());
+    console.log("Dealer's hand:", this.dealer.getHand());
     let action: Action;
     while (!this.player.isBusted()) {
       action = await this.waitForPlayerAction();
@@ -107,7 +113,7 @@ export class BlackjackGame {
 
   // Method to handle the dealer's turn
   private playDealerTurn(): void {
-    this.dealer.revealFirstCard();
+    this.dealer.revealHiddenCard();
     console.log("Dealer's hand:", this.dealer.getHand(), this.dealer.getValue());
     while (this.dealer.getValue() < 17) {
       this.dealCard(this.dealer);
@@ -142,6 +148,10 @@ class Participant {
   isBusted(): Boolean {
     return this.getValue() > 21;
   }
+
+  toss(): void {
+    this.hand = [];
+  }
 }
 
 class Player extends Participant {}
@@ -149,7 +159,7 @@ class Player extends Participant {}
 class Dealer extends Participant {
   private isFirstCardRevealed: boolean = false;
 
-  revealFirstCard() {
+  revealHiddenCard() {
     this.isFirstCardRevealed = true;
   }
 
@@ -159,6 +169,11 @@ class Dealer extends Participant {
     } else {
       return [this.hand[0], { suit: "Hidden", rank: "Hidden" }];
     }
+  }
+
+  toss(): void {
+    this.hand = [];
+    this.isFirstCardRevealed = false;
   }
 }
 

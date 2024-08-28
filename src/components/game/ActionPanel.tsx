@@ -8,7 +8,7 @@ interface ActionPanelProps {
   resolveAction: (action: Action) => void;
 }
 
-const ActionPanel: React.FC<ActionPanelProps> = ({ resolveAction }) => {
+const ActionPanel = ({ resolveAction }: ActionPanelProps) => {
   return (
     <div className="action-panel">
       <div className="action-panel-row">

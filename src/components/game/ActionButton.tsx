@@ -8,7 +8,7 @@ interface ActionButtonProps {
   resolveAction: (action: Action) => void;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({ action, src, resolveAction }) => {
+const ActionButton = ({ action, src, resolveAction }: ActionButtonProps) => {
   const handleClick = () => {
     resolveAction(action);
   };

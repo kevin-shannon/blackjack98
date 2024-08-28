@@ -5,12 +5,16 @@ import PlayingCard from "./PlayingCard";
 import { BlackjackGame } from "../../blackjack";
 
 interface DeckShoeProps {
-  game: BlackjackGame;
+  game: BlackjackGame | null;
 }
 
-const DeckShoe: React.FC<DeckShoeProps> = ({ game }) => {
+const DeckShoe = ({ game }: DeckShoeProps) => {
   const dealHand = () => {
-    game.startGame();
+    if (game) {
+      game.startGame();
+    } else {
+      console.error("Game instance is not available.");
+    }
   };
 
   const hiddenCard: Card = { suit: "Hidden", rank: "Hidden" };
