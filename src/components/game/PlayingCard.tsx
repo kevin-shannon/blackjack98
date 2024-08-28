@@ -13,13 +13,9 @@ function PlayingCard({ card, isFaceUp }: PlayingCardProps) {
 
   const cardImage = faceUp ? `cards/${card.suit}_${card.rank}.png` : "cards/backs/card_back.png";
 
-  const toggleCard = () => {
-    setFaceUp(!faceUp);
-  };
-
   return (
     <div className="playing-card" onClick={() => {}}>
-      <img src={cardImage} />
+      <img src={cardImage} alt={card.rank} />
     </div>
   );
 }
