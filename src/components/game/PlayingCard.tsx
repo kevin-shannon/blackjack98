@@ -15,7 +15,7 @@ function PlayingCard({ card, isFaceUp }: PlayingCardProps) {
 
   return (
     <div className="playing-card" onClick={() => {}}>
-      <img src={cardImage} alt={card.rank} />
+      <img src={`${process.env.PUBLIC_URL}/${cardImage}`} alt={card.rank} />
     </div>
   );
 }

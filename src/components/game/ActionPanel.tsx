@@ -12,16 +12,16 @@ const ActionPanel = ({ resolveAction }: ActionPanelProps) => {
   return (
     <div className="action-panel">
       <div className="action-panel-row">
-        <ActionButton action={Action.DOUBLE} src={"2x.png"} resolveAction={resolveAction} />
-        <ActionButton action={Action.SURRENDER} src={"surrender.png"} resolveAction={resolveAction} />
+        <ActionButton action={Action.DOUBLE} src={`${process.env.PUBLIC_URL}/double.png`} resolveAction={resolveAction} />
+        <ActionButton action={Action.SURRENDER} src={`${process.env.PUBLIC_URL}/surrender.png`} resolveAction={resolveAction} />
       </div>
       <div className="action-panel-row">
-        <ActionButton action={Action.HIT} src={"hit.png"} resolveAction={resolveAction} />
-        <ActionButton action={Action.SPLIT} src={"split.png"} resolveAction={resolveAction} />
+        <ActionButton action={Action.HIT} src={`${process.env.PUBLIC_URL}/hit.png`} resolveAction={resolveAction} />
+        <ActionButton action={Action.SPLIT} src={`${process.env.PUBLIC_URL}/split.png`} resolveAction={resolveAction} />
       </div>
       <div className="action-panel-row">
-        <ActionButton action={Action.STAND} src={"stand.png"} resolveAction={resolveAction} />
-        <ActionButton action={Action.INSURANCE} src={"insurance.png"} resolveAction={resolveAction} />
+        <ActionButton action={Action.STAND} src={`${process.env.PUBLIC_URL}/stand.png`} resolveAction={resolveAction} />
+        <ActionButton action={Action.INSURANCE} src={`${process.env.PUBLIC_URL}/insurance.png`} resolveAction={resolveAction} />
       </div>
     </div>
   );
