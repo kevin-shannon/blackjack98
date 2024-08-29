@@ -94,7 +94,7 @@ export class BlackjackGame {
   }
 
   // Method to handle the player's turn
-  private async playPlayerTurn(): Promise<void> {
+  public async playPlayerTurn(): Promise<void> {
     console.log("Player's hand:", this.player.getHand(), this.player.getValue());
     console.log("Dealer's hand:", this.dealer.getHand());
     let action: Action;
@@ -106,7 +106,6 @@ export class BlackjackGame {
       if (action === Action.STAND) {
         break;
       }
-      console.log("Player's hand:", this.player.getHand(), this.player.getValue());
     }
     console.log("Player's hand:", this.player.getHand(), this.player.getValue());
   }
