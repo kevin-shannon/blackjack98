@@ -12,7 +12,7 @@ const PlayerHand = ({ hand }: PlayerHandProps) => {
     <div className="player-hand">
       {hand.map((card, index) => {
         const xOffset = index * 20;
-        const yOffset = index * -10;
+        const yOffset = index * -20;
         return <PlayingCard key={index} card={card} isFaceUp={true} style={{ transform: `translate(${xOffset}px, ${yOffset}px)` }} />;
       })}
     </div>

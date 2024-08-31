@@ -137,7 +137,6 @@ export class BlackjackGame {
     let action: Action;
     while (!this.player.isBusted()) {
       action = await waitForPlayerAction();
-      console.log(this.player.getHand());
       if (action === Action.HIT) {
         this.dealCard(this.player);
       }
