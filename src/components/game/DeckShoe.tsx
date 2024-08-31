@@ -5,13 +5,13 @@ import PlayingCard from "./PlayingCard";
 import { BlackjackGame } from "../../blackjack";
 
 interface DeckShoeProps {
-  game: BlackjackGame | null;
+  startGame: () => Promise<void> | null;
 }
 
-const DeckShoe = ({ game }: DeckShoeProps) => {
+const DeckShoe = ({ startGame }: DeckShoeProps) => {
   const dealHand = () => {
-    if (game) {
-      game.startGame();
+    if (startGame) {
+      startGame();
     } else {
       console.error("Game instance is not available.");
     }

@@ -37,17 +37,30 @@ function shuffleDeck(deck: Deck): Deck {
 
 /** Blackjack Game Class */
 
+type StateChangeListener = () => void;
+
 export class BlackjackGame {
   private shoe: Deck;
   private player: Player;
   private dealer: Dealer;
-  private waitForPlayerAction: () => Promise<Action>;
+  private listeners: StateChangeListener[] = [];
 
-  constructor(numDecks: number, waitForPlayerAction: () => Promise<Action>) {
+  constructor(numDecks: number) {
     this.shoe = createShoe(numDecks);
     this.player = new Player();
     this.dealer = new Dealer();
-    this.waitForPlayerAction = waitForPlayerAction;
+  }
+
+  onStateChange(listener: StateChangeListener) {
+    this.listeners.push(listener);
+  }
+
+  offStateChange(listener: StateChangeListener) {
+    this.listeners = this.listeners.filter((l) => l !== listener);
+  }
+
+  private notifyStateChange() {
+    this.listeners.forEach((listener) => listener());
   }
 
   dealCard(participant: Player | Dealer): Card {
@@ -57,6 +70,7 @@ export class BlackjackGame {
 
     const card = this.shoe.pop()!;
     participant.addCard(card);
+    this.notifyStateChange();
     return card;
   }
 
@@ -99,7 +113,7 @@ export class BlackjackGame {
     console.log("Dealer's hand:", this.dealer.getHand());
     let action: Action;
     while (!this.player.isBusted()) {
-      action = await this.waitForPlayerAction();
+      action = await waitForPlayerAction();
       if (action === Action.HIT) {
         this.dealCard(this.player);
       }
@@ -124,6 +138,31 @@ export class BlackjackGame {
     }
   }
 }
+
+const waitForPlayerAction = (): Promise<Action> => {
+  return new Promise<Action>((resolve) => {
+    const hitButton = document.getElementById("Hit-button");
+    const standButton = document.getElementById("Stand-button");
+
+    if (!hitButton || !standButton) {
+      console.error("Buttons not found in the document.");
+      resolve(Action.STAND);
+      return;
+    }
+
+    const handleClick = (action: Action) => {
+      resolve(action);
+      hitButton.removeEventListener("click", handleHitClick);
+      standButton.removeEventListener("click", handleStandClick);
+    };
+
+    const handleHitClick = () => handleClick(Action.HIT);
+    const handleStandClick = () => handleClick(Action.STAND);
+
+    hitButton.addEventListener("click", handleHitClick);
+    standButton.addEventListener("click", handleStandClick);
+  });
+};
 
 class Participant {
   protected hand: Deck = [];
