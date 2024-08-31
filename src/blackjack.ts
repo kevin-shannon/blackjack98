@@ -223,7 +223,7 @@ class Dealer extends Participant {
 
   getHand(): Deck {
     let hand = this.hand.slice();
-    if (!this.isFirstCardRevealed && hand.length != 0) {
+    if (!this.isFirstCardRevealed && hand.length !== 0) {
       hand[0] = hiddenCard;
     }
     return hand;
