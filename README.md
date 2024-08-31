@@ -1,4 +1,4 @@
-# plus-two
+# blackjack98
 blackjack counting trainer
 
-### Try it out: https://kevinshannon.com/plus-two/
+### Try it out: https://kevinshannon.com/blackjack98/
