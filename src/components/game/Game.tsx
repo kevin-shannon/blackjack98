@@ -5,6 +5,7 @@ import "./Game.css";
 import "98.css";
 import { BlackjackGame } from "../../blackjack";
 import PlayerHand from "./PlayerHand";
+import DealerHand from "./DealerHand";
 
 let game = new BlackjackGame(1);
 
@@ -36,6 +37,7 @@ function Game() {
       <ActionPanel />
       <DeckShoe startGame={game.startGame.bind(game)} />
       <PlayerHand hand={game.getPlayerHand()} />
+      <DealerHand hand={game.getDealerHand()} />
     </div>
   );
 }

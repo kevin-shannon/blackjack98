@@ -1,4 +1,4 @@
-import { Suit, Rank, Card, Deck, Action } from "./enums";
+import { Suit, Rank, Card, Deck, Action, hiddenCard } from "./enums";
 
 /** Functions for building and shuffling the shoe */
 
@@ -70,7 +70,6 @@ export class BlackjackGame {
 
     const card = this.shoe.pop()!;
     participant.addCard(card);
-    this.notifyStateChange();
     return card;
   }
 
@@ -78,6 +77,7 @@ export class BlackjackGame {
     this.scoop();
     this.dealPlayerHand();
     this.dealDealerHand();
+    this.notifyStateChange();
     await this.playPlayerTurn();
     if (!this.player.isBusted()) {
       this.playDealerTurn();
@@ -87,6 +87,7 @@ export class BlackjackGame {
   scoop(): void {
     this.player.toss();
     this.dealer.toss();
+    this.notifyStateChange();
   }
 
   dealPlayerHand(): void {
@@ -109,30 +110,26 @@ export class BlackjackGame {
 
   // Method to handle the player's turn
   public async playPlayerTurn(): Promise<void> {
-    console.log("Player's hand:", this.player.getHand(), this.player.getValue());
-    console.log("Dealer's hand:", this.dealer.getHand());
     let action: Action;
     while (!this.player.isBusted()) {
       action = await waitForPlayerAction();
       if (action === Action.HIT) {
         this.dealCard(this.player);
+        this.notifyStateChange();
       }
       if (action === Action.STAND) {
         break;
       }
     }
-    console.log("Player's hand:", this.player.getHand(), this.player.getValue());
   }
 
   // Method to handle the dealer's turn
   private playDealerTurn(): void {
     this.dealer.revealHiddenCard();
-    console.log("Dealer's hand:", this.dealer.getHand(), this.dealer.getValue());
     while (this.dealer.getValue() < 17) {
       this.dealCard(this.dealer);
-      console.log("Dealer's hand:", this.dealer.getHand(), this.dealer.getValue());
+      this.notifyStateChange();
       if (this.dealer.isBusted()) {
-        console.log("Dealer busted!");
         break;
       }
     }
@@ -145,7 +142,6 @@ const waitForPlayerAction = (): Promise<Action> => {
     const standButton = document.getElementById("Stand-button");
 
     if (!hitButton || !standButton) {
-      console.error("Buttons not found in the document.");
       resolve(Action.STAND);
       return;
     }
@@ -202,11 +198,11 @@ class Dealer extends Participant {
   }
 
   getHand(): Deck {
-    if (this.isFirstCardRevealed) {
-      return super.getHand();
-    } else {
-      return [this.hand[0], { suit: "Hidden", rank: "Hidden" }];
+    let hand = this.hand.slice();
+    if (!this.isFirstCardRevealed && hand.length != 0) {
+      hand[0] = hiddenCard;
     }
+    return hand;
   }
 
   toss(): void {

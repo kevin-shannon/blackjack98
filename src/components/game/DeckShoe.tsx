@@ -1,8 +1,7 @@
 import "./DeckShoe.css";
 import "98.css";
-import { Card } from "../../enums";
+import { hiddenCard } from "../../enums";
 import PlayingCard from "./PlayingCard";
-import { BlackjackGame } from "../../blackjack";
 
 interface DeckShoeProps {
   startGame: () => Promise<void> | null;
@@ -16,8 +15,6 @@ const DeckShoe = ({ startGame }: DeckShoeProps) => {
       console.error("Game instance is not available.");
     }
   };
-
-  const hiddenCard: Card = { suit: "Hidden", rank: "Hidden" };
 
   return (
     <div className="deck-shoe" onClick={dealHand}>
