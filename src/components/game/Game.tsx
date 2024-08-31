@@ -10,7 +10,7 @@ import DealerHand from "./DealerHand";
 let game = new BlackjackGame(6);
 
 function Game() {
-  const [_, setGameState] = useState({
+  const [, setGameState] = useState({
     playerHand: game.getPlayerHand(),
     dealerHand: game.getDealerHand(),
   });
