@@ -43,6 +43,7 @@ export class BlackjackGame {
   private shoe: Deck;
   private player: Player;
   private dealer: Dealer;
+  private isGameInProgress = false;
   private listeners: StateChangeListener[] = [];
 
   constructor(numDecks: number) {
@@ -70,17 +71,40 @@ export class BlackjackGame {
 
     const card = this.shoe.pop()!;
     participant.addCard(card);
+    this.notifyStateChange();
     return card;
   }
 
   async startGame(): Promise<void> {
-    this.scoop();
-    this.dealPlayerHand();
-    this.dealDealerHand();
-    this.notifyStateChange();
-    await this.playPlayerTurn();
-    if (!this.player.isBusted()) {
-      this.playDealerTurn();
+    if (this.isGameInProgress) {
+      console.log("Game already in progress.");
+      return;
+    }
+
+    this.isGameInProgress = true;
+
+    try {
+      this.scoop();
+      this.dealPlayerHand();
+      this.dealDealerHand();
+
+      if (this.player.checkIfNatural() || this.dealer.checkIfNatural()) {
+        if (this.dealer.checkIfNatural()) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          this.dealer.revealHiddenCard();
+          this.notifyStateChange();
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        this.scoop();
+        return;
+      }
+
+      await this.playPlayerTurn();
+      if (!this.player.isBusted()) {
+        await this.playDealerTurn();
+      }
+    } finally {
+      this.isGameInProgress = false;
     }
   }
 
@@ -113,9 +137,9 @@ export class BlackjackGame {
     let action: Action;
     while (!this.player.isBusted()) {
       action = await waitForPlayerAction();
+      console.log(this.player.getHand());
       if (action === Action.HIT) {
         this.dealCard(this.player);
-        this.notifyStateChange();
       }
       if (action === Action.STAND) {
         break;
@@ -126,9 +150,9 @@ export class BlackjackGame {
   // Method to handle the dealer's turn
   private playDealerTurn(): void {
     this.dealer.revealHiddenCard();
+    this.notifyStateChange();
     while (this.dealer.getValue() < 17) {
       this.dealCard(this.dealer);
-      this.notifyStateChange();
       if (this.dealer.isBusted()) {
         break;
       }
@@ -176,7 +200,7 @@ class Participant {
   }
 
   checkIfNatural(): Boolean {
-    return this.getValue() === 21;
+    return this.getValue() === 21 && this.hand.length === 2;
   }
 
   isBusted(): Boolean {

@@ -7,7 +7,7 @@ import { BlackjackGame } from "../../blackjack";
 import PlayerHand from "./PlayerHand";
 import DealerHand from "./DealerHand";
 
-let game = new BlackjackGame(1);
+let game = new BlackjackGame(6);
 
 function Game() {
   const [gameState, setGameState] = useState({
