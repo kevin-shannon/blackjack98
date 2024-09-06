@@ -4,7 +4,7 @@ import { Suit, Rank, Card, Deck, Action, hiddenCard } from "./enums";
 
 function createDeck(): Deck {
   const suits: Suit[] = [Suit.HEART, Suit.DIAMOND, Suit.CLUB, Suit.SPADE];
-  const ranks: Rank[] = ["4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "A"];
+  const ranks: Rank[] = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
   let deck: Deck = [];
 
@@ -64,12 +64,15 @@ export class BlackjackGame {
     this.listeners.forEach((listener) => listener());
   }
 
-  dealCard(participant: Player | Dealer, handIndex: number = 0): Card {
+  dealCard(participant: Player | Dealer, handIndex: number = 0, isDouble?: boolean): Card {
     if (this.shoe.length === 0) {
       throw new Error("No more cards in the shoe!");
     }
 
     const card = this.shoe.pop()!;
+    if (isDouble) {
+      card.isDoubled = true;
+    }
     participant.addCard(card, handIndex);
     this.notifyStateChange();
     return card;
@@ -151,9 +154,13 @@ export class BlackjackGame {
         if (action === Action.STAND) {
           break; // Move on to the next hand
         }
-
         if (action === Action.SPLIT) {
           this.player.splitHand(handIndex); // Split the hand
+          this.notifyStateChange();
+        }
+        if (action === Action.DOUBLE && this.player.getHand(handIndex).length === 2) {
+          this.dealCard(this.player, handIndex, true);
+          break;
         }
       }
       handIndex++; // Move to the next hand
@@ -178,8 +185,9 @@ const waitForPlayerAction = (): Promise<Action> => {
     const hitButton = document.getElementById("Hit-button");
     const standButton = document.getElementById("Stand-button");
     const splitButton = document.getElementById("Split-button");
+    const doubleButton = document.getElementById("Double-button");
 
-    if (!hitButton || !standButton || !splitButton) {
+    if (!hitButton || !standButton || !splitButton || !doubleButton) {
       resolve(Action.STAND);
       return;
     }
@@ -189,15 +197,18 @@ const waitForPlayerAction = (): Promise<Action> => {
       hitButton.removeEventListener("click", handleHitClick);
       standButton.removeEventListener("click", handleStandClick);
       splitButton.removeEventListener("click", handleSplitClick);
+      doubleButton.removeEventListener("click", handleDoubleClick);
     };
 
     const handleHitClick = () => handleClick(Action.HIT);
     const handleStandClick = () => handleClick(Action.STAND);
     const handleSplitClick = () => handleClick(Action.SPLIT);
+    const handleDoubleClick = () => handleClick(Action.DOUBLE);
 
     hitButton.addEventListener("click", handleHitClick);
     standButton.addEventListener("click", handleStandClick);
     splitButton.addEventListener("click", handleSplitClick);
+    doubleButton.addEventListener("click", handleDoubleClick);
   });
 };
 
