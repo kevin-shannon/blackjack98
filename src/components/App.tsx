@@ -7,7 +7,7 @@ function App() {
     <div className="App">
       <div className="window" style={{ display: "inline-block" }}>
         <div className="title-bar">
-          <div className="title-bar-text">BlackJack</div>
+          <div className="title-bar-text">BlackJack98</div>
           <div className="title-bar-controls"></div>
         </div>
         <div className="window-body">

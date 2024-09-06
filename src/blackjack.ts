@@ -4,7 +4,7 @@ import { Suit, Rank, Card, Deck, Action, hiddenCard } from "./enums";
 
 function createDeck(): Deck {
   const suits: Suit[] = [Suit.HEART, Suit.DIAMOND, Suit.CLUB, Suit.SPADE];
-  const ranks: Rank[] = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+  const ranks: Rank[] = ["4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "4", "A"];
 
   let deck: Deck = [];
 
@@ -64,13 +64,13 @@ export class BlackjackGame {
     this.listeners.forEach((listener) => listener());
   }
 
-  dealCard(participant: Player | Dealer): Card {
+  dealCard(participant: Player | Dealer, handIndex: number = 0): Card {
     if (this.shoe.length === 0) {
       throw new Error("No more cards in the shoe!");
     }
 
     const card = this.shoe.pop()!;
-    participant.addCard(card);
+    participant.addCard(card, handIndex);
     this.notifyStateChange();
     return card;
   }
@@ -124,8 +124,8 @@ export class BlackjackGame {
     this.dealCard(this.dealer);
   }
 
-  getPlayerHand(): Deck {
-    return this.player.getHand();
+  getPlayerHand(): Deck[] {
+    return this.player.getHands();
   }
 
   getDealerHand(): Deck {
@@ -135,14 +135,28 @@ export class BlackjackGame {
   // Method to handle the player's turn
   public async playPlayerTurn(): Promise<void> {
     let action: Action;
-    while (!this.player.isBusted()) {
-      action = await waitForPlayerAction();
-      if (action === Action.HIT) {
-        this.dealCard(this.player);
+    let handIndex = 0;
+
+    // Loop through the hands dynamically
+    while (handIndex < this.player.getNumberOfHands()) {
+      // Keep playing the current hand until it's either busted or the player stands
+      while (!this.player.isBusted(handIndex)) {
+        console.log(this.player.getHands());
+        action = await waitForPlayerAction();
+        console.log(handIndex);
+        if (action === Action.HIT) {
+          this.dealCard(this.player, handIndex); // Deal card to the current hand
+        }
+
+        if (action === Action.STAND) {
+          break; // Move on to the next hand
+        }
+
+        if (action === Action.SPLIT) {
+          this.player.splitHand(handIndex); // Split the hand
+        }
       }
-      if (action === Action.STAND) {
-        break;
-      }
+      handIndex++; // Move to the next hand
     }
   }
 
@@ -163,8 +177,9 @@ const waitForPlayerAction = (): Promise<Action> => {
   return new Promise<Action>((resolve) => {
     const hitButton = document.getElementById("Hit-button");
     const standButton = document.getElementById("Stand-button");
+    const splitButton = document.getElementById("Split-button");
 
-    if (!hitButton || !standButton) {
+    if (!hitButton || !standButton || !splitButton) {
       resolve(Action.STAND);
       return;
     }
@@ -173,63 +188,99 @@ const waitForPlayerAction = (): Promise<Action> => {
       resolve(action);
       hitButton.removeEventListener("click", handleHitClick);
       standButton.removeEventListener("click", handleStandClick);
+      splitButton.removeEventListener("click", handleSplitClick);
     };
 
     const handleHitClick = () => handleClick(Action.HIT);
     const handleStandClick = () => handleClick(Action.STAND);
+    const handleSplitClick = () => handleClick(Action.SPLIT);
 
     hitButton.addEventListener("click", handleHitClick);
     standButton.addEventListener("click", handleStandClick);
+    splitButton.addEventListener("click", handleSplitClick);
   });
 };
 
 class Participant {
-  protected hand: Deck = [];
+  protected hand: Deck[] = [[]]; // Now an array of hands
 
-  addCard(card: Card): void {
-    this.hand.push(card);
+  // Add a card to a specific hand
+  addCard(card: Card, handIndex: number = 0): void {
+    this.hand[handIndex].push(card);
   }
 
-  getHand(): Deck {
+  // Get a specific hand
+  getHand(handIndex: number = 0): Deck {
+    return this.hand[handIndex];
+  }
+
+  // Get all hands
+  getHands(): Deck[] {
     return this.hand;
   }
 
-  getValue(): number {
-    return calculateHandValue(this.hand);
+  // Get the value of a specific hand
+  getValue(handIndex: number = 0): number {
+    return calculateHandValue(this.hand[handIndex]);
   }
 
-  checkIfNatural(): Boolean {
-    return this.getValue() === 21 && this.hand.length === 2;
+  // Check if a specific hand is a natural blackjack
+  checkIfNatural(handIndex: number = 0): Boolean {
+    return this.getValue(handIndex) === 21 && this.hand[handIndex].length === 2;
   }
 
-  isBusted(): Boolean {
-    return this.getValue() > 21;
+  // Check if a specific hand is busted
+  isBusted(handIndex: number = 0): Boolean {
+    return this.getValue(handIndex) > 21;
   }
 
+  // Clear all hands
   toss(): void {
-    this.hand = [];
+    this.hand = [[]];
+  }
+
+  // Get the number of hands
+  getNumberOfHands(): number {
+    return this.hand.length;
   }
 }
 
-class Player extends Participant {}
+class Player extends Participant {
+  // Split the hand at the given handIndex if the first two cards are of the same rank
+  splitHand(handIndex: number): void {
+    const currentHand = this.hand[handIndex];
 
+    // Ensure the hand can be split (it has exactly 2 cards and the ranks match)
+    if (currentHand.length === 2 && currentHand[0].rank === currentHand[1].rank) {
+      const secondCard = currentHand.pop(); // Remove the second card from the current hand
+
+      if (secondCard) {
+        // Insert the new hand immediately after the current hand
+        this.hand.splice(handIndex + 1, 0, [secondCard]);
+      }
+    }
+  }
+}
 class Dealer extends Participant {
   private isFirstCardRevealed: boolean = false;
 
+  // Reveal the hidden card
   revealHiddenCard() {
     this.isFirstCardRevealed = true;
   }
 
-  getHand(): Deck {
-    let hand = this.hand.slice();
+  // Get the first hand, hiding the first card if not revealed
+  getHand(handIndex: number = 0): Deck {
+    let hand = this.hand[handIndex].slice();
     if (!this.isFirstCardRevealed && hand.length !== 0) {
       hand[0] = hiddenCard;
     }
     return hand;
   }
 
+  // Clear all hands and reset the first card reveal status
   toss(): void {
-    this.hand = [];
+    this.hand = [[]];
     this.isFirstCardRevealed = false;
   }
 }
