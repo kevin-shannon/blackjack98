@@ -1,6 +1,7 @@
 import "./App.css";
 import "98.css";
 import Game from "./game/Game";
+import MenuBar from "./MenuBar";
 
 function App() {
   return (
@@ -10,7 +11,8 @@ function App() {
           <div className="title-bar-text">BlackJack98</div>
           <div className="title-bar-controls"></div>
         </div>
-        <div className="window-body">
+        <MenuBar />
+        <div className="window-body" style={{ margin: "0 8px 8px 8px" }}>
           <Game />
         </div>
         <div className="status-bar">

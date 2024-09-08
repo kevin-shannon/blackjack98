@@ -1,0 +1,16 @@
+.menu-bar {
+  display: flex;
+  margin: 0 8px;
+  height: 20px;
+}
+
+.menu-bar-item {
+  display: flex;
+  align-items: center;
+  padding: 2px 5px;
+  margin: 1px 0;
+}
+
+.menu-bar-item:hover {
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf;
+}
