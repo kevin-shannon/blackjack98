@@ -1,9 +1,10 @@
 import "./App.css";
 import "98.css";
 import Game from "./game/Game";
-import MenuBar from "./MenuBar";
-import Rules from "./Rules";
-import Settings from "./Settings"
+import MenuBar from "./os/menu/MenuBar";
+import MenuPopup from "./os/menu/MenuPopup";
+import Rules from "./os/Rules";
+import Settings from "./os/Settings";
 
 function App() {
   return (
@@ -23,8 +24,8 @@ function App() {
           <p className="status-bar-field">CPU Usage: 14%</p>
         </div>
       </div>
-      <Rules/>
-      <Settings/>
+      <Rules />
+      <Settings />
     </div>
   );
 }
