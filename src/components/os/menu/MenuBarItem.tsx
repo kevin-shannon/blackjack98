@@ -1,4 +1,4 @@
-import "./MenuItem.css";
+import "./MenuBarItem.css";
 import MenuPopup from "./MenuPopup";
 
 interface MenuBarItemProps {
@@ -16,7 +16,7 @@ function MenuBarItem({ label, items, isPopupOpen, openPopup }: MenuBarItemProps)
 
   return (
     <div className="menu-bar-item">
-      <div onClick={handleClick}>
+      <div className="menu-bar-item-button" onClick={handleClick}>
         <span>{label}</span>
       </div>
       <MenuPopup items={items} isVisible={isPopupOpen} />

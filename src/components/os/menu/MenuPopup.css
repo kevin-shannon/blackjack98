@@ -1,4 +1,5 @@
 .menu-popup {
   position: absolute;
+  transform: translateY(20px);
   z-index: 1;
 }
