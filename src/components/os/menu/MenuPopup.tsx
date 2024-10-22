@@ -11,11 +11,11 @@ function MenuPopup({ items, isVisible }: MenuPopupProps) {
 
   return (
     <div className="menu-popup window">
-      <ul className="menu-items">
+      <div className="menu-items">
         {items.map((item, index) => (
           <MenuItem item={item} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

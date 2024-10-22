@@ -7,18 +7,35 @@ interface MenuBarItemProps {
   isPopupOpen: boolean;
   openPopup: () => void;
   closeAllPopups: () => void;
+  isAnyPopupOpen: boolean;
 }
 
-function MenuBarItem({ label, items, isPopupOpen, openPopup }: MenuBarItemProps) {
-  const handleClick = () => {
+function MenuBarItem({
+  label,
+  items,
+  isPopupOpen,
+  openPopup,
+  isAnyPopupOpen,
+}: MenuBarItemProps) {
+  const handleInteraction = () => {
     openPopup();
   };
 
   return (
-    <div className="menu-bar-item">
-      <div className="menu-bar-item-button" onClick={handleClick}>
+    <div
+      className="menu-bar-item"
+      onMouseEnter={() => {
+        if (isAnyPopupOpen && !isPopupOpen) {
+          handleInteraction();
+        }
+      }}
+    >
+      <button
+        className={`menu-bar-item-button ${isPopupOpen ? "active" : ""}`}
+        onMouseDown={handleInteraction}
+      >
         <span>{label}</span>
-      </div>
+      </button>
       <MenuPopup items={items} isVisible={isPopupOpen} />
     </div>
   );
