@@ -4,15 +4,28 @@ import { Action } from "../../enums";
 
 interface ActionButtonProps {
   action: Action;
-  src: string;
+  src?: string;
+  size: string;
+  text?: string;
 }
 
-const ActionButton = ({ action, src }: ActionButtonProps) => {
+const ActionButton = ({ action, src, size, text }: ActionButtonProps) => {
   return (
-    <button className="action-button">
-      <img id={`${action}-button`} src={src} alt={action} className="action-button-img" draggable="false"/>
+    <button className={`action-button ${size}`}>
+      {text ? (
+        <span className="action-button-text">{text}</span>
+      ) : (
+        <img
+          id={`${action}-button`}
+          src={src}
+          alt={action}
+          className="action-button-img"
+          draggable="false"
+        />
+      )}
     </button>
   );
 };
 
 export default ActionButton;
+

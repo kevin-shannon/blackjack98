@@ -1,6 +1,19 @@
 .action-button {
-  height: 50px;
-  min-width: 50px;
-  width: 50px;
   padding: 0px;
+  min-width: unset;
+}
+
+.action-button.big {
+  height: 75px;
+  width: 75px;
+}
+
+.action-button.small {
+  height: 50px;
+  width: 50px;
+}
+
+.action-button-text {
+  font-size: large;
+  font-weight: 600;
 }
