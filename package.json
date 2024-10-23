@@ -42,5 +42,8 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://kevinshannon.com/blackjack98/"
+  "homepage": "https://kevinshannon.com/blackjack98/",
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
 }

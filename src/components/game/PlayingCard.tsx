@@ -14,8 +14,8 @@ function PlayingCard({ card, isFaceUp, style }: PlayingCardProps) {
   const cardImage = faceUp && card !== undefined && card !== hiddenCard ? `cards/${card.suit}_${card.rank}.png` : "cards/backs/card_back.png";
 
   return (
-    <div className="playing-card" style={style} onClick={() => {}}>
-      <img src={`${process.env.PUBLIC_URL}/${cardImage}`} alt={card ? card.rank : "facedown card"} draggable="false"/>
+    <div className="playing-card" style={style} onClick={() => { }}>
+      <img src={`${process.env.PUBLIC_URL}/${cardImage}`} alt={card ? card.rank : "facedown card"} draggable="false" />
     </div>
   );
 }
