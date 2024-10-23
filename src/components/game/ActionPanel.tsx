@@ -4,9 +4,24 @@ import "98.css";
 import { Action } from "../../enums";
 import ActionButton from "./ActionButton";
 
-const ActionPanel = () => {
+interface ActionPanelProps {
+  startGame: () => Promise<void> | null;
+}
+
+const ActionPanel = ({ startGame }: ActionPanelProps) => {
+  const dealHand = () => {
+    if (startGame) {
+      startGame();
+    } else {
+      console.error("Game instance is not available.");
+    }
+  };
+
   return (
     <div className="action-panel">
+      <div className="action-panel-row">
+        <button className="deal-button" onClick={dealHand}>Deal</button>
+      </div>
       <div className="action-panel-row">
         <ActionButton action={Action.HIT} text="Hit" size="big" />
         <ActionButton action={Action.STAND} text="Stand" size="big" />

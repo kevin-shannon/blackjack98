@@ -34,8 +34,8 @@ function Game() {
   }, []);
   return (
     <div style={{ width: 640, height: 480, backgroundColor: "var(--primary-jade)" }}>
-      <ActionPanel />
-      <DeckShoe startGame={game.startGame.bind(game)} />
+      <ActionPanel startGame={game.startGame.bind(game)} />
+      <DeckShoe />
       <PlayerHand hand={game.getPlayerHand()} />
       <DealerHand hand={game.getDealerHand()} />
     </div>

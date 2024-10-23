@@ -7,3 +7,10 @@
 .action-panel-row {
   display: flex;
 }
+
+.deal-button {
+  width: 150px;
+  height: 25px;
+  font-size: 12px;
+  font-weight: 600;
+}
