@@ -1,4 +1,4 @@
-import "./MenuItem.css";
+import "./MenuPopupItem.css";
 
 interface MenuItemProps {
   item: string;

@@ -15,7 +15,7 @@ function PlayingCard({ card, isFaceUp, style }: PlayingCardProps) {
 
   return (
     <div className="playing-card" style={style} onClick={() => {}}>
-      <img src={`${process.env.PUBLIC_URL}/${cardImage}`} alt={card ? card.rank : "facedown card"} />
+      <img src={`${process.env.PUBLIC_URL}/${cardImage}`} alt={card ? card.rank : "facedown card"} draggable="false"/>
     </div>
   );
 }

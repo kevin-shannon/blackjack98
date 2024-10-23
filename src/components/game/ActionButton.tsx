@@ -10,7 +10,7 @@ interface ActionButtonProps {
 const ActionButton = ({ action, src }: ActionButtonProps) => {
   return (
     <button className="action-button">
-      <img id={`${action}-button`} src={src} alt={action} className="action-button-img" />
+      <img id={`${action}-button`} src={src} alt={action} className="action-button-img" draggable="false"/>
     </button>
   );
 };

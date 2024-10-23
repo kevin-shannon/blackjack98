@@ -1,0 +1,11 @@
+.menu-popup-item {
+    min-width: 100px;
+    padding: 3px 5px;
+    cursor: default;
+    user-select: none;
+}
+
+.menu-popup-item:hover {
+    background-color: var(--primary-navy);
+    color: var(--primary-white);
+}

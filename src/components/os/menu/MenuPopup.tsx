@@ -1,4 +1,4 @@
-import MenuItem from "./MenuItem";
+import MenuItem from "./MenuPopupItem";
 import "./MenuPopup.css";
 
 interface MenuPopupProps {
