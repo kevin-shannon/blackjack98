@@ -1,3 +1,6 @@
+import { useContext } from 'react';
+import { GameMode } from "../../../enums";
+import { GameModeContext } from "../../../context/GameModeContext";
 import "./MenuBarItem.css";
 import MenuPopup from "./MenuPopup";
 
@@ -6,7 +9,6 @@ interface MenuBarItemProps {
   items: string[];
   isPopupOpen: boolean;
   openPopup: () => void;
-  closeAllPopups: () => void;
   isAnyPopupOpen: boolean;
 }
 
@@ -17,8 +19,13 @@ function MenuBarItem({
   openPopup,
   isAnyPopupOpen,
 }: MenuBarItemProps) {
-  const handleInteraction = () => {
-    openPopup();
+
+  // Call useContext only once in the component body
+  const setGameMode = useContext(GameModeContext);
+
+  // Use the setGameMode in the handler
+  const HandleItemClick = (item: string) => {
+    setGameMode(item as GameMode);  // Set the game mode
   };
 
   return (
@@ -26,19 +33,20 @@ function MenuBarItem({
       className="menu-bar-item"
       onMouseEnter={() => {
         if (isAnyPopupOpen && !isPopupOpen) {
-          handleInteraction();
+          openPopup();
         }
       }}
     >
       <button
         className={`menu-bar-item-button ${isPopupOpen ? "active" : ""}`}
-        onMouseDown={handleInteraction}
+        onMouseDown={openPopup}
       >
         <span>{label}</span>
       </button>
-      <MenuPopup items={items} isVisible={isPopupOpen} />
+      <MenuPopup items={items} isVisible={isPopupOpen} onItemClick={HandleItemClick} />
     </div>
   );
 }
 
 export default MenuBarItem;
+

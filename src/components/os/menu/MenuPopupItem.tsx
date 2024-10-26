@@ -2,14 +2,15 @@ import "./MenuPopupItem.css";
 
 interface MenuItemProps {
   item: string;
+  onClick: () => void;
 }
 
-function MenuItem({ item }: MenuItemProps) {
+function MenuPopupItem({ item, onClick }: MenuItemProps) {
   return (
-    <div className="menu-popup-item">
+    <div className="menu-popup-item" onClick={onClick}>
       <span>{item}</span>
     </div>
   );
 }
 
-export default MenuItem;
+export default MenuPopupItem;

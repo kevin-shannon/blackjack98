@@ -2,11 +2,18 @@ import "./App.css";
 import "98.css";
 import Game from "./game/Game";
 import MenuBar from "./os/menu/MenuBar";
-import MenuPopup from "./os/menu/MenuPopup";
 import Rules from "./os/Rules";
 import Settings from "./os/Settings";
+import { GameMode } from "../enums";
+import { useState } from "react";
+import { GameModeContext } from '../context/GameModeContext';
 
 function App() {
+  const [gameMode, setGameMode] = useState(GameMode.BASIC);
+  const [userSettings, setUserSettings] = useState([]);
+
+  console.log(gameMode)
+
   return (
     <div className="App">
       <div className="window" style={{ display: "inline-block" }}>
@@ -14,14 +21,11 @@ function App() {
           <div className="title-bar-text">BlackJack98</div>
           <div className="title-bar-controls"></div>
         </div>
-        <MenuBar />
+        <GameModeContext.Provider value={setGameMode}>
+          <MenuBar />
+        </GameModeContext.Provider>
         <div className="window-body" style={{ margin: "0 8px 8px 8px" }}>
           <Game />
-        </div>
-        <div className="status-bar">
-          <p className="status-bar-field">Press F1 for help</p>
-          <p className="status-bar-field">Slide 1</p>
-          <p className="status-bar-field">CPU Usage: 14%</p>
         </div>
       </div>
       <Rules />

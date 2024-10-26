@@ -49,10 +49,9 @@ function MenuBar() {
     <div className="menu-bar" ref={menuRef}>
       <MenuBarItem
         label="Game"
-        items={["Basic Strategy", "Running Count", "True Count", "Freeplay"]}
+        items={["Basic Strategy", "Counting Practice", "Freeplay"]}
         isPopupOpen={isGamePopupOpen}
         openPopup={() => openPopup("Game")}
-        closeAllPopups={closeAllPopups}
         isAnyPopupOpen={isAnyPopupOpen}
       />
       <MenuBarItem
@@ -60,7 +59,6 @@ function MenuBar() {
         items={["Rules", "Settings", "Customization"]}
         isPopupOpen={isOptionsPopupOpen}
         openPopup={() => openPopup("Options")}
-        closeAllPopups={closeAllPopups}
         isAnyPopupOpen={isAnyPopupOpen}
       />
       <MenuBarItem
@@ -68,7 +66,6 @@ function MenuBar() {
         items={["Learn more"]}
         isPopupOpen={isAboutPopupOpen}
         openPopup={() => openPopup("About")}
-        closeAllPopups={closeAllPopups}
         isAnyPopupOpen={isAnyPopupOpen}
       />
     </div>
