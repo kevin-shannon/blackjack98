@@ -1,4 +1,4 @@
-import { Suit, Rank, Card, Deck, Action, hiddenCard } from "./enums";
+import { Suit, Rank, Card, Deck, Action, hiddenCard, GameMode } from "./enums";
 
 /** Functions for building and shuffling the shoe */
 
@@ -46,8 +46,12 @@ export class BlackjackGame {
   private isGameInProgress = false;
   private listeners: StateChangeListener[] = [];
 
-  constructor(numDecks: number) {
-    this.shoe = createShoe(numDecks);
+  constructor(gameMode: GameMode, numDecks: number = 6) {
+    if (gameMode === GameMode.BASIC) {
+      this.shoe = createShoe(1);
+    } else {
+      this.shoe = createShoe(numDecks);
+    }
     this.player = new Player();
     this.dealer = new Dealer();
   }
@@ -213,7 +217,7 @@ const waitForPlayerAction = (): Promise<Action> => {
 };
 
 class Participant {
-  protected hand: Deck[] = [[]]; // Now an array of hands
+  protected hand: Deck[] = [[]];
 
   // Add a card to a specific hand
   addCard(card: Card, handIndex: number = 0): void {

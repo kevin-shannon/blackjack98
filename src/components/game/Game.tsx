@@ -6,10 +6,14 @@ import "98.css";
 import { BlackjackGame } from "../../blackjack";
 import PlayerHand from "./PlayerHand";
 import DealerHand from "./DealerHand";
+import { GameMode } from "../../enums";
 
-let game = new BlackjackGame(6);
+interface GameProps {
+  gameMode: GameMode;
+}
 
-function Game() {
+function Game({ gameMode }: GameProps) {
+  let game = new BlackjackGame(gameMode);
   const [, setGameState] = useState({
     playerHand: game.getPlayerHand(),
     dealerHand: game.getDealerHand(),

@@ -25,7 +25,7 @@ function App() {
           <MenuBar />
         </GameModeContext.Provider>
         <div className="window-body" style={{ margin: "0 8px 8px 8px" }}>
-          <Game />
+          <Game gameMode={gameMode} />
         </div>
       </div>
       <Rules />
