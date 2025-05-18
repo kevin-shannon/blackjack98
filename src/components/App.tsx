@@ -2,17 +2,15 @@ import "./App.css";
 import "98.css";
 import Content from "./game/Content";
 import MenuBar from "./os/menu/MenuBar";
-import Rules from "./os/Rules";
-import Settings from "./os/Settings";
 import { GameMode } from "../enums";
 import { useState } from "react";
-import { GameModeContext } from '../context/GameModeContext';
+import { GameModeContext } from "../context/GameModeContext";
 
 function App() {
   const [gameMode, setGameMode] = useState(GameMode.START);
   const [userSettings, setUserSettings] = useState([]);
 
-  console.log(gameMode)
+  console.log(gameMode);
 
   return (
     <div className="App">
@@ -28,8 +26,6 @@ function App() {
           <Content gameMode={gameMode} />
         </div>
       </div>
-      <Rules />
-      <Settings />
     </div>
   );
 }
