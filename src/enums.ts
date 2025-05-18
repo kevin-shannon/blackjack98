@@ -23,6 +23,7 @@ export enum Action {
 }
 
 export enum GameMode {
+  START = "Start Menu",
   BASIC = "Basic Strategy",
   COUNTING = "Counting Practice",
   FREEPLAY = "Freeplay",

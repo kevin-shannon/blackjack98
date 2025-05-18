@@ -14,8 +14,8 @@ function MenuPopup({ items, isVisible, onItemClick }: MenuPopupProps) {
   return (
     <div className="menu-popup window">
       <div className="menu-items">
-        {items.map((item, _) => (
-          <MenuPopupItem item={item} onClick={() => onItemClick(item)} />
+        {items.map((item, index) => (
+          <MenuPopupItem key={index} item={item} onClick={() => onItemClick(item)} />
         ))}
       </div>
     </div>

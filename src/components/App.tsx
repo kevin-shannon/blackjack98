@@ -1,6 +1,6 @@
 import "./App.css";
 import "98.css";
-import Game from "./game/Game";
+import Content from "./game/Content";
 import MenuBar from "./os/menu/MenuBar";
 import Rules from "./os/Rules";
 import Settings from "./os/Settings";
@@ -9,7 +9,7 @@ import { useState } from "react";
 import { GameModeContext } from '../context/GameModeContext';
 
 function App() {
-  const [gameMode, setGameMode] = useState(GameMode.BASIC);
+  const [gameMode, setGameMode] = useState(GameMode.START);
   const [userSettings, setUserSettings] = useState([]);
 
   console.log(gameMode)
@@ -25,7 +25,7 @@ function App() {
           <MenuBar />
         </GameModeContext.Provider>
         <div className="window-body" style={{ margin: "0 8px 8px 8px" }}>
-          <Game gameMode={gameMode} />
+          <Content gameMode={gameMode} />
         </div>
       </div>
       <Rules />
