@@ -44,6 +44,18 @@
   },
   "homepage": "https://kevinshannon.com/blackjack98/",
   "devDependencies": {
-    "prettier": "^3.3.3"
+    "prettier": "^3.5.3"
+  },
+  "description": "blackjack counting trainer",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevin-shannon/plus-two.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kevin-shannon/plus-two/issues"
   }
 }
