@@ -1,0 +1,7 @@
+dist/
+test-results/
+playwright-report/
+.sites-runtime/
+package-lock.json
+src/assets/
+src/styles/legacy.css
