@@ -22,6 +22,14 @@ npm.cmd run preview
 
 The production build is written to `dist/`. Its relative asset paths support hosting below a subdirectory. The app currently needs only static hosting.
 
+## GitHub Pages
+
+Live site: https://kevin-shannon.github.io/blackjack98/
+
+Every push to `main` runs `.github/workflows/deploy-pages.yml`: install locked dependencies with `npm ci`, run the game regression tests, type-check and build, and deploy `dist/` to GitHub Pages. Failed tests or builds prevent deployment. You can also run it manually from the repository's Actions tab.
+
+The repository's Settings → Pages → Source must be **GitHub Actions**. The workflow uses GitHub's built-in token and Pages environment; no deployment secret or `gh-pages` branch is needed. It obtains the site's base path from Pages metadata and passes it to Vite so assets load under `/blackjack98/`. Local development retains its relative base path.
+
 ## Organization
 
 ```text
