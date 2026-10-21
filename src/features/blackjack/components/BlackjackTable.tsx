@@ -53,7 +53,7 @@ export function BlackjackTable() {
           </div>
         </div>
         <div className="dealer-area">
-          <div className="seat-label">
+          <div className="seat-label" hidden={state.hands.length === 0}>
             Dealer <span className="score-pill">{known}</span>
           </div>
           <div className="cards">

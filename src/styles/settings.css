@@ -141,3 +141,6 @@
 .table-tools .count-peek {
   text-shadow: none;
 }
+.center-band {
+  gap: 14px;
+}

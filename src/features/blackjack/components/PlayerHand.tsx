@@ -53,7 +53,7 @@ export function PlayerHand({
             >
               {hand.result}
             </b>
-            {' · ' +
+            {' ' +
               (profit > 0
                 ? '+' + money(profit)
                 : profit < 0
@@ -67,7 +67,7 @@ export function PlayerHand({
               : hand.status === 'surrender'
                 ? 'SURRENDER'
                 : 'STAND'}{' '}
-            · {money(hand.bet)}
+            {money(hand.bet)}
           </>
         ) : (
           <>
