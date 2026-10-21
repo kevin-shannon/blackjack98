@@ -24,7 +24,9 @@ The production build is written to `dist/`. Its relative asset paths support hos
 
 ## GitHub Pages
 
-Live site: https://kevin-shannon.github.io/blackjack98/
+Live site: https://kevinshannon.com/blackjack98/
+
+This project inherits the account's existing `kevinshannon.com` Pages domain. The default https://kevin-shannon.github.io/blackjack98/ address redirects there.
 
 Every push to `main` runs `.github/workflows/deploy-pages.yml`: install locked dependencies with `npm ci`, run the game regression tests, type-check and build, and deploy `dist/` to GitHub Pages. Failed tests or builds prevent deployment. You can also run it manually from the repository's Actions tab.
 
