@@ -26,10 +26,10 @@ export function ShoeMeter({
       ctx.fillStyle = '#c0c0c0';
       ctx.fillRect(0, 0, width, height);
       ctx.imageSmoothingEnabled = false;
-      ctx.fillStyle = '#222222';
+      ctx.fillStyle = '#000080';
       const filled = Math.round(width * fraction),
-        step = Math.max(4, Math.round(5 * dpr)),
-        gap = Math.max(1, Math.round(dpr));
+        step = Math.max(8, Math.round(8 * dpr)),
+        gap = Math.max(2, Math.round(2 * dpr));
       for (let x = 0; x < filled; x += step)
         ctx.fillRect(x, 0, Math.min(step - gap, filled - x), height);
     }

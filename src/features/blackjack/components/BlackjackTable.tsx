@@ -1,4 +1,5 @@
 import { useBlackjack } from '../hooks/useBlackjack';
+import type { CSSProperties } from 'react';
 import { money } from '../../../shared/lib/format';
 import { score } from '../model/cards';
 import { PlayingCard } from './PlayingCard';
@@ -81,7 +82,17 @@ export function BlackjackTable() {
           </div>
         </div>
         <div className="player-area">
-          <div className="hands-row">
+          <div
+            className="hands-row"
+            style={
+              {
+                '--max-card-count': Math.max(
+                  1,
+                  ...state.hands.map((hand) => hand.cards.length),
+                ),
+              } as CSSProperties
+            }
+          >
             {state.hands.map((hand, index) => (
               <PlayerHand
                 key={hand.cards[0]?.id ?? `empty-${index}`}

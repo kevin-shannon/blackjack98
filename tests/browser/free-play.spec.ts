@@ -2,6 +2,74 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
+test('split hand slots and labels stay aligned with different card counts', async ({
+  page,
+}, testInfo) => {
+  await page.addInitScript(() => {
+    let calls = 0,
+      seed = 52;
+    Math.random = () => {
+      // Repeat the same full 6-deck shuffle despite development-mode remounts.
+      if (calls++ % 311 === 0) seed = 52;
+      seed = (Math.imul(1664525, seed) + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    Object.assign(Math.random, {
+      reset: () => {
+        calls = 0;
+        seed = 52;
+      },
+    });
+  });
+  await page.goto('/');
+  await page
+    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
+    .click();
+  await page.evaluate(() =>
+    (Math.random as typeof Math.random & { reset: () => void }).reset(),
+  );
+  await page.getByRole('button', { name: 'START FREE PLAY' }).click();
+  await page.getByRole('button', { name: 'DEAL CARDS' }).click();
+  await expect(
+    page.getByRole('button', { name: 'SPLIT', exact: true }),
+  ).toBeEnabled();
+  await page.getByRole('button', { name: 'SPLIT', exact: true }).click();
+  await expect(page.locator('.hand-slot')).toHaveCount(2);
+  await expect(
+    page.getByRole('button', { name: 'HIT', exact: true }),
+  ).toBeEnabled();
+  await page.getByRole('button', { name: 'HIT', exact: true }).click();
+  await expect(
+    page.locator('.hand-slot').nth(0).locator('.stack-card'),
+  ).toHaveCount(3);
+  await expect(
+    page.locator('.hand-slot').nth(1).locator('.stack-card'),
+  ).toHaveCount(2);
+  await expect(page.locator('.hand-slot.current')).toHaveCSS(
+    'border-top-color',
+    'rgb(189, 255, 152)',
+  );
+  for (const width of [1280, 375]) {
+    await page.setViewportSize({ width, height: 1100 });
+    const slots = await page.locator('.hand-slot').evaluateAll((elements) =>
+      elements.map((element) => {
+        const slot = element.getBoundingClientRect();
+        const label = element
+          .querySelector('.seat-label')!
+          .getBoundingClientRect();
+        return { height: slot.height, labelTop: label.top };
+      }),
+    );
+    expect(Math.abs(slots[0].height - slots[1].height)).toBeLessThan(1);
+    expect(Math.abs(slots[0].labelTop - slots[1].labelTop)).toBeLessThan(1);
+  }
+  await page.screenshot({
+    path: testInfo.outputPath('aligned-split-hands-mobile.png'),
+    fullPage: true,
+    animations: 'disabled',
+  });
+});
+
 test('reveals the running count only while held, including keyboard and lost focus', async ({
   page,
 }) => {

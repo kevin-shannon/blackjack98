@@ -144,3 +144,32 @@
 .center-band {
   gap: 14px;
 }
+.hand-slot.current {
+  border-color: #bdff98;
+}
+.hands-row {
+  align-items: stretch;
+}
+.hand-slot .stacked-cards {
+  height: calc(
+    var(--stack-card-h) + (var(--max-card-count, var(--card-count)) - 1) *
+      var(--stack-rise) + 9px
+  );
+}
+.shoe-track {
+  width: 280px;
+  height: 22px;
+  flex-basis: 280px;
+}
+@media (max-width: 570px) {
+  .shoe-track {
+    width: 160px;
+    flex-basis: 160px;
+  }
+}
+@media (max-width: 385px) {
+  .shoe-track {
+    width: 128px;
+    flex-basis: 128px;
+  }
+}
