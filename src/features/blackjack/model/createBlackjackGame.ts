@@ -1,4 +1,8 @@
 import {
+  createFreePlayStats,
+  recordFreePlayRound,
+} from '../../stats/sessionStats';
+import {
   DEAL_DELAY as DELAY,
   MAX_HANDS,
   RANKS,
@@ -90,6 +94,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     repository.save({ rules, options, chip: selectedChip });
   }
   const state: GameState = {
+    stats: createFreePlayStats(),
     minBet: options.minBet,
     maxBet: options.maxBet,
     bankroll: options.startingBankroll,
@@ -104,15 +109,10 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     active: 0,
     insuranceBet: 0,
     round: 1,
-    completedRounds: 0,
     roundStartBankroll: options.startingBankroll,
     lastDealtId: null,
-    sessionNet: 0,
     message: 'Choose your wager to begin.',
     netResult: 0,
-    wins: 0,
-    losses: 0,
-    pushes: 0,
     runningCount: 0,
     seen: new Set(),
   };
@@ -493,17 +493,13 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
       h.payout = payout;
       h.complete = true;
       state.bankroll += payout;
-      if (['WIN', 'BLACKJACK'].includes(result)) state.wins++;
-      else if (result === 'PUSH') state.pushes++;
-      else state.losses++;
       all.push(result);
     }
     state.netResult = state.bankroll - state.roundStartBankroll;
-    state.sessionNet += state.netResult;
+    state.stats = recordFreePlayRound(state.stats, all, state.netResult);
     revealDealer();
     state.phase = 'roundOver';
     state.busy = false;
-    state.completedRounds++;
     if (all.length === 1) {
       const desc = {
         BLACKJACK: `Blackjack! Paid ${roundRules.payout}.`,
@@ -536,6 +532,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     });
   }
   function resetSession() {
+    state.stats = createFreePlayStats();
     roundEpoch++;
     stopTimer();
     state.bankroll = options.startingBankroll;
@@ -550,15 +547,10 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     state.active = 0;
     state.insuranceBet = 0;
     state.round = 1;
-    state.completedRounds = 0;
     state.roundStartBankroll = options.startingBankroll;
     state.lastDealtId = null;
-    state.sessionNet = 0;
     state.message = 'Choose your wager to begin.';
     state.netResult = 0;
-    state.wins = 0;
-    state.losses = 0;
-    state.pushes = 0;
     state.panel = null;
     state.modeStarted = true;
     makeShoe();

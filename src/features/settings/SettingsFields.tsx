@@ -6,7 +6,7 @@ import {
   MAX_BET_VALUES,
   STAKES_PRESETS,
 } from './stakes';
-function Slider({
+export function Slider({
   id,
   label,
   value,
@@ -49,7 +49,7 @@ function Slider({
     </div>
   );
 }
-function Checkbox({
+export function Checkbox({
   label,
   checked,
   description,

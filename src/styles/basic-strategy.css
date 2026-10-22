@@ -1,0 +1,102 @@
+.menu-modal .mode-tile + .mode-tile {
+  margin-top: 10px;
+}
+.menu-utilities .action-btn + .action-btn {
+  margin-top: 8px;
+}
+.strategy-table-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.strategy-feedback-area {
+  min-height: 130px;
+}
+.strategy-explanation {
+  min-height: 30px;
+  max-width: 95%;
+  text-align: center;
+  font-size: 11px;
+  color: #fff;
+  line-height: 1.5;
+}
+.strategy-hand {
+  min-width: 176px;
+}
+.strategy-hand .strategy-cards {
+  min-height: 105px;
+}
+.strategy-action-panel {
+  margin-top: 9px;
+  min-height: auto;
+}
+.strategy-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+.strategy-actions .strategy-correct-action:disabled {
+  opacity: 1;
+  filter: none;
+  background: #bdff98;
+  color: #111;
+}
+.strategy-actions .strategy-wrong-action:disabled {
+  opacity: 1;
+  filter: none;
+  background: #ffd7d7;
+  color: #800000;
+}
+.strategy-session-stats {
+  line-height: 1.7;
+}
+.strategy-difficulty {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.strategy-difficulty legend {
+  padding: 0;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.strategy-difficulty-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.strategy-difficulty-choice {
+  padding: 10px;
+  border: 2px solid;
+  border-color: #fff #808080 #808080 #fff;
+  align-items: flex-start;
+}
+.strategy-difficulty-choice:has(input:checked) {
+  border-color: #808080 #fff #fff #808080;
+  background: #d4d4d4;
+}
+.strategy-difficulty-choice span {
+  min-width: 0;
+}
+.strategy-difficulty-choice strong,
+.strategy-difficulty-choice small {
+  display: block;
+}
+.strategy-difficulty-choice small {
+  margin-top: 5px;
+  line-height: 1.4;
+  color: #444;
+}
+@media (max-width: 460px) {
+  .strategy-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .strategy-actions .action-btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .strategy-table-meta {
+    gap: 6px;
+  }
+}

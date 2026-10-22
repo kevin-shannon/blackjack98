@@ -39,10 +39,22 @@ src/
   app/
     App.tsx                    Application composition
     trainingModes.ts           Mode menu metadata
+    ModeNavigation.tsx         Persistent, separate controllers and mode switching
+    ModeMenu.tsx               Shared mode selection and resume controls
   assets/
     cards.ts                   Original 53 base64 card images
     brand.ts                   Original base64 app icon
   features/
+    basic-strategy/
+      BasicStrategy.tsx        Rapid-fire practice screen
+      components/              Relevant rules, options, and dialogs
+      hooks/                   React subscription to the trainer
+      model/
+        strategy.ts            Total-dependent strategy and rule variations
+        questions.ts           Independent draws from all 52 cards
+        createStrategyTrainer.ts  Answer, feedback, timer, and session lifecycle
+        settings.ts            Separate validated preference storage
+        *.test.ts              Strategy and trainer regression tests
     blackjack/
       FreePlay.tsx             Free Play screen and window chrome
       components/              Cards, hands, table, betting, actions, dialogs
@@ -57,13 +69,17 @@ src/
       SettingsFields.tsx       Shared setup and live-settings controls
       settingsRepository.ts    Validated browser persistence
       *.test.ts                Saved-settings compatibility tests
+    stats/
+      sessionStats.ts          Mode-tagged stats contracts and update functions
   shared/
     lib/format.ts              Currency display
     ui/                        Reusable beveled buttons and accessible dialogs
+    ui/GameWindow.tsx          Shared window chrome for all modes
   styles/
     legacy.css                 Original CSS, including its v14 refinements
 tests/browser/
   free-play.spec.ts            Browser workflows and optional legacy captures
+  basic-strategy.spec.ts       Practice, timers, preferences, and mode isolation
 ```
 
 ## Behavior preserved
@@ -79,9 +95,21 @@ Game Options now has a Stakes selector: Small Fry ($500 bankroll, $5–$250 bets
 
 Dialogs now retain React-controlled fields while sliders move, keep keyboard focus inside, and make the underlying table inert. Event listeners, observers, and timers have explicit cleanup. In-flight rounds use cancellation tokens so a reset cannot resume stale dealing animations.
 
+## Basic Strategy
+
+Choose Basic Strategy from the main menu, set DAS, H17, late surrender, difficulty, and optional timed hands, then start. Every question deals two player cards and one dealer upcard. One action is graded immediately, the correct action is highlighted, and the next independent question appears after 1.1 seconds. No hand plays out.
+
+Normal gives every physical card a 1/52 chance on each draw, with replacement; ten-valued ranks retain their natural combined probability of 4/13. Naturals are skipped because they have no initial decision. Difficult samples uniformly from the [rule-specific edge-case cells](docs/basic-strategy-edge-cases.md), with replacement, then varies the card composition, order, suits, and ten-valued ranks. A cell qualifies if its correct action differs from an immediately adjacent dealer upcard or player total within the same hand family. Pairs compare dealer upcards only. Both difficulties continue indefinitely.
+
+Grading uses standard total-dependent multi-deck strategy with dealer peek, doubling on any first two cards, and the selected rules, based on [Michael Shackleford's strategy reference](https://wizardofodds.com/games/blackjack/strategy/4-decks/). Deck composition and card-count deviations are not used. The Difficult pool is derived from the grading function in `model/difficultHands.ts` and follows changes to table rules.
+
+Accuracy is correct answers divided by all attempts. Timeouts count as incorrect. Streaks, misses, and timeout counts are recorded only in this mode's `BasicStrategyStats`; Free Play keeps its own `FreePlayStats` with net return, rounds, and hand outcomes. Both controllers remain alive when switching screens, and both modes can be resumed from the menu. Menus and switching away pause the trainer's decision and feedback clocks. A new session resets only the selected mode. Statistics remain in memory until page reload; no account or server persistence is added.
+
+Basic Strategy preferences, including difficulty, use `blackjack98-basic-strategy-v1`, independently of Free Play's existing storage key. Older preferences default to Normal. Changing a table rule during practice resets the Basic Strategy session: all counters and feedback are cleared, and a fresh hand starts under the new rules with a full decision timer. Difficulty changes skip the current unscored question and retain prior accuracy. Keyboard shortcuts match Free Play: H/S/D/P/R.
+
 ## Adding features later
 
-**Training modes:** create a feature directory with its screen and training logic, register its metadata in `app/trainingModes.ts`, and wire menu selection to that screen in `GameDialogs.tsx` or an application-level mode switch. The current registry describes the single implemented mode; routing is intentionally not added yet. Reuse `blackjack/model/cards.ts`, card components, and settings controls where appropriate.
+**Training modes:** create a feature directory with its screen and training logic, register its metadata in `app/trainingModes.ts`, then extend `ModeNavigation.tsx` and the mode switch in `App.tsx`. Give the controller its own typed session stats and preference key. Reuse card scoring, artwork, settings controls, and `GameWindow` where appropriate. Modes currently use an application-level switch without URL routing.
 
 **Achievements and progress:** `createBlackjackGame` accepts an optional `onRoundComplete` callback. It receives the mode, round number, net result, bankroll, hand results, and rules once settlement finishes. A future application service can consume that event. Add more detailed decision events when a training mode needs them; the current event does not contain decision history. The settings repository is injectable for tests and future storage adapters.
 

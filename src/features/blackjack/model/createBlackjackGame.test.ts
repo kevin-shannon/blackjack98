@@ -72,7 +72,7 @@ describe('rounds and payouts', () => {
     await finish(game.deal());
     expect(state().phase).toBe('roundOver');
     expect(state().bankroll).toBe(expected);
-    expect(state().wins).toBe(1);
+    expect(state().stats.wins).toBe(1);
     expect(completed).toHaveBeenCalledOnce();
     expect(completed.mock.calls[0][0]).toMatchObject({
       modeId: 'free-play',
@@ -87,7 +87,7 @@ describe('rounds and payouts', () => {
     expect(state().seen.size).toBe(3);
     await finish(game.act('stand'));
     expect(state().bankroll).toBe(1000);
-    expect(state().pushes).toBe(1);
+    expect(state().stats.pushes).toBe(1);
     expect(state().seen.size).toBe(4);
   });
   it('pays insurance against dealer blackjack', async () => {
@@ -97,7 +97,7 @@ describe('rounds and payouts', () => {
     await finish(game.insure(true));
     expect(state().bankroll).toBe(1000);
     expect(state().insuranceBet).toBe(12.5);
-    expect(state().losses).toBe(1);
+    expect(state().stats.losses).toBe(1);
   });
   it('returns both natural wagers when the dealer also has blackjack', async () => {
     const { game, state } = scenario(['A', 'A', 'K', 'K']);
@@ -186,7 +186,7 @@ describe('splitting and cancellation', () => {
       bankroll: 1000,
       phase: 'betting',
       hands: [],
-      sessionNet: 0,
+      stats: { sessionNet: 0 },
     });
   });
   it('cancels an in-flight deal without applying stale cards after a reset', async () => {

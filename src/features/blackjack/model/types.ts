@@ -1,3 +1,4 @@
+import type { FreePlayStats } from '../../stats/sessionStats';
 export type Suit = 'S' | 'H' | 'D' | 'C';
 export type Rank =
   'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K';
@@ -49,6 +50,7 @@ export interface Hand {
   doubled: boolean;
 }
 export interface GameState {
+  stats: FreePlayStats;
   minBet: number;
   maxBet: number;
   bankroll: number;
@@ -63,15 +65,10 @@ export interface GameState {
   active: number;
   insuranceBet: number;
   round: number;
-  completedRounds: number;
   roundStartBankroll: number;
   lastDealtId: number | null;
-  sessionNet: number;
   message: string;
   netResult: number;
-  wins: number;
-  losses: number;
-  pushes: number;
   runningCount: number;
   seen: Set<number>;
 }

@@ -3,44 +3,11 @@ import { Dialog } from '../../../shared/ui/Dialog';
 import { ActionButton } from '../../../shared/ui/ActionButton';
 import { RuleFields, OptionFields } from '../../settings/SettingsFields';
 import { money } from '../../../shared/lib/format';
-import { trainingModes } from '../../../app/trainingModes';
+import { ModeMenu } from '../../../app/ModeMenu';
 export function GameDialogs() {
   const { game, state, rules, options, draftRules, draftOptions } =
     useBlackjack();
-  if (state.panel === 'menu')
-    return (
-      <Dialog
-        key="menu"
-        title="Blackjack 98 — Main Menu"
-        className="menu-modal"
-      >
-        <div className="dialog-cap">BLACKJACK 98</div>
-        <h2>MAIN MENU</h2>
-        <div className="menu-section-title">SELECT GAME MODE</div>
-        {trainingModes.map((mode) => (
-          <button
-            type="button"
-            key={mode.id}
-            className="mode-tile"
-            onClick={() => game.configureFreePlay()}
-          >
-            <span>
-              <strong>{mode.title}</strong>
-              <small>{mode.description}</small>
-            </span>
-            <span className="mode-arrow">▶</span>
-          </button>
-        ))}
-        <div className="future-mode">▦ &nbsp; More game modes coming later</div>
-        {state.modeStarted && (
-          <div className="menu-utilities">
-            <ActionButton className="primary wide" onClick={game.closePanel}>
-              RESUME GAME
-            </ActionButton>
-          </div>
-        )}
-      </Dialog>
-    );
+  if (state.panel === 'menu') return <ModeMenu />;
   if (state.panel === 'setup')
     return (
       <Dialog
