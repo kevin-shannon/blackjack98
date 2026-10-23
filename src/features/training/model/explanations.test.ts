@@ -65,6 +65,42 @@ describe.each(['basic-strategy', 'deviations'] as const)(
         state: () => trainer.getSnapshot().state,
       };
     }
+    it('discards a run and its pending timers without losing saved options', async () => {
+      const { trainer, state, disconnect } = practice();
+      const savedSettings = trainer.getSnapshot().settings;
+      trainer.answer('stand');
+      expect(state().stats.attempts).toBe(1);
+      trainer.configure();
+      trainer.updateOption('skipExplanations', true);
+      trainer.discardSession();
+      await vi.advanceTimersByTimeAsync(60000);
+      expect(state()).toMatchObject({
+        started: false,
+        panel: 'menu',
+        phase: 'idle',
+        question: null,
+        feedback: null,
+        stats: {
+          attempts: 0,
+          correct: 0,
+          incorrect: 0,
+          streak: 0,
+          bestStreak: 0,
+          timeouts: 0,
+        },
+      });
+      expect(trainer.getSnapshot().settings).toEqual(savedSettings);
+      expect(trainer.getSnapshot().draft).toBeNull();
+      trainer.configure();
+      trainer.start();
+      expect(state()).toMatchObject({
+        started: true,
+        phase: 'answering',
+        stats: { attempts: 0 },
+      });
+      expect(trainer.getSnapshot().timerSeconds).toBe(3);
+      disconnect();
+    });
     it('waits indefinitely after a mistake or timeout until Next hand, without scoring twice', async () => {
       const { trainer, state, disconnect } = practice();
       trainer.nextHand();

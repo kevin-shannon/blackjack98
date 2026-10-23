@@ -19,11 +19,11 @@ interface Navigation {
   trainer: StrategyTrainer;
   deviationTrainer: DeviationTrainer;
   selectMode: (mode: TrainingModeId) => void;
-  resumeMode: (mode: TrainingModeId) => void;
-  canResume: (mode: TrainingModeId) => boolean;
+  resumeGame: () => void;
+  canResume: () => boolean;
 }
 const NavigationContext = createContext<Navigation | null>(null);
-/** Controllers live above the mode switch; changing screens keeps each session separate. */
+/** Only the selected mode keeps a session; changing modes discards the previous run. */
 export function ModeNavigationProvider({ children }: { children: ReactNode }) {
   const { game } = useBlackjack();
   const [trainer] = useState(() => createStrategyTrainer());
@@ -33,6 +33,11 @@ export function ModeNavigationProvider({ children }: { children: ReactNode }) {
   useEffect(() => deviationTrainer.connect(), [deviationTrainer]);
   const selectMode = useCallback(
     (mode: TrainingModeId) => {
+      if (mode !== activeMode) {
+        if (activeMode === 'free-play') game.discardSession();
+        else if (activeMode === 'basic-strategy') trainer.discardSession();
+        else deviationTrainer.discardSession();
+      }
       game.openPanel('menu');
       trainer.suspend();
       deviationTrainer.suspend();
@@ -41,35 +46,28 @@ export function ModeNavigationProvider({ children }: { children: ReactNode }) {
       else deviationTrainer.configure();
       setActiveMode(mode);
     },
-    [game, trainer, deviationTrainer],
+    [activeMode, game, trainer, deviationTrainer],
   );
-  const resumeMode = useCallback(
-    (mode: TrainingModeId) => {
-      game.openPanel('menu');
-      trainer.suspend();
-      deviationTrainer.suspend();
-      if (mode === 'free-play') game.closePanel();
-      else if (mode === 'basic-strategy') trainer.activate();
-      else deviationTrainer.activate();
-      setActiveMode(mode);
-    },
-    [game, trainer, deviationTrainer],
-  );
+  const resumeGame = useCallback(() => {
+    if (activeMode === 'free-play') game.closePanel();
+    else if (activeMode === 'basic-strategy') trainer.activate();
+    else deviationTrainer.activate();
+  }, [activeMode, game, trainer, deviationTrainer]);
   const value = useMemo(
     () => ({
       activeMode,
       trainer,
       deviationTrainer,
       selectMode,
-      resumeMode,
-      canResume: (mode: TrainingModeId) =>
-        mode === 'free-play'
+      resumeGame,
+      canResume: () =>
+        activeMode === 'free-play'
           ? game.getSnapshot().state.modeStarted
-          : mode === 'basic-strategy'
+          : activeMode === 'basic-strategy'
             ? trainer.getSnapshot().state.started
             : deviationTrainer.getSnapshot().state.started,
     }),
-    [activeMode, trainer, deviationTrainer, selectMode, resumeMode, game],
+    [activeMode, trainer, deviationTrainer, selectMode, resumeGame, game],
   );
   return (
     <NavigationContext.Provider value={value}>

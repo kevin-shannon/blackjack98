@@ -141,7 +141,7 @@ test('uses H17 Fab 4 indices, resets on rule changes, and saves preferences sepa
   ).not.toBeChecked();
 });
 
-test('resumes Basic Strategy and Deviations with independent sessions and resets', async ({
+test('resumes only the current drill and wipes sessions on mode switches while keeping preferences', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -153,33 +153,35 @@ test('resumes Basic Strategy and Deviations with independent sessions and resets
   await page.getByRole('button', { name: 'Split', exact: true }).click();
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
   await page.getByRole('button', { name: /^DEVIATIONS / }).click();
+  await page.getByRole('radio', { name: 'Fab 4', exact: true }).check();
   await page.getByRole('button', { name: 'START DEVIATIONS' }).click();
   await page.getByRole('button', { name: 'Stand', exact: true }).click();
-  await expect(page.getByLabel('Deviations accuracy')).toContainText('0.0%');
+  const review = page.getByRole('region', { name: 'Explanation', exact: true });
+  await expect(review).toBeVisible();
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'RESUME BASIC STRATEGY', exact: true })
-    .click();
-  await expect(page.getByLabel('Basic Strategy accuracy')).toContainText(
-    '100.0%',
+  await expect(page.getByRole('button', { name: /^RESUME / })).toHaveCount(1);
+  await page.getByRole('button', { name: 'RESUME GAME', exact: true }).click();
+  await expect(review).toBeVisible();
+  await expect(page.locator('.strategy-session-stats')).toContainText(
+    'CORRECT 0 / 1',
   );
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'RESUME DEVIATIONS', exact: true })
-    .click();
-  await expect(page.getByLabel('Deviations accuracy')).toContainText('0.0%');
-  await page.getByRole('button', { name: 'New Session', exact: true }).click();
-  await page.getByRole('button', { name: 'RESET', exact: true }).click();
+  await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
+  await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
   await expect(page.locator('.strategy-session-stats')).toContainText(
     'CORRECT 0 / 0',
   );
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'RESUME BASIC STRATEGY', exact: true })
-    .click();
+  await page.getByRole('button', { name: /^DEVIATIONS / }).click();
+  await expect(
+    page.getByRole('radio', { name: 'Fab 4', exact: true }),
+  ).toBeChecked();
+  await page.getByRole('button', { name: 'START DEVIATIONS' }).click();
+  await expect(review).toHaveCount(0);
   await expect(page.locator('.strategy-session-stats')).toContainText(
-    'CORRECT 1 / 1',
+    'CORRECT 0 / 0',
   );
+  await expect(page.getByLabel('Current round')).toHaveText('ROUND 01');
 });
 
 test('fits a phone, pauses timed questions in menus, and counts a timeout once', async ({

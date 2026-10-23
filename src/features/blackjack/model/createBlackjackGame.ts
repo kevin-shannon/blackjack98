@@ -532,6 +532,14 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     });
   }
   function resetSession() {
+    initializeSession(true);
+  }
+  function discardSession() {
+    draftRules = null;
+    draftOptions = null;
+    initializeSession(false);
+  }
+  function initializeSession(started: boolean) {
     state.stats = createFreePlayStats();
     roundEpoch++;
     stopTimer();
@@ -551,9 +559,15 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     state.lastDealtId = null;
     state.message = 'Choose your wager to begin.';
     state.netResult = 0;
-    state.panel = null;
-    state.modeStarted = true;
-    makeShoe();
+    state.panel = started ? null : 'menu';
+    state.modeStarted = started;
+    if (started) makeShoe();
+    else {
+      shoe = [];
+      shoeDecks = 0;
+      state.runningCount = 0;
+      state.seen.clear();
+    }
     render();
   }
   function cancelRoundForRuleChange() {
@@ -698,6 +712,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     backToMenu,
     startFreePlay,
     resetSession,
+    discardSession,
     updateRule,
     updateOption,
     canBet,

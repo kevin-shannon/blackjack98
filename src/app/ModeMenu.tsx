@@ -6,7 +6,7 @@ import playIcon from '../assets/play.png';
 import smileyIcon from '../assets/smiley.png';
 
 export function ModeMenu() {
-  const { activeMode, selectMode, resumeMode, canResume } = useModeNavigation();
+  const { selectMode, resumeGame, canResume } = useModeNavigation();
   return (
     <Dialog
       title="Blackjack 98 — Main Menu"
@@ -62,17 +62,11 @@ export function ModeMenu() {
         </section>
       ))}
       <div className="menu-utilities">
-        {trainingModes
-          .filter((mode) => canResume(mode.id))
-          .map((mode) => (
-            <ActionButton
-              key={mode.id}
-              className={mode.id === activeMode ? 'primary wide' : 'wide'}
-              onClick={() => resumeMode(mode.id)}
-            >
-              {mode.id === activeMode ? 'RESUME GAME' : `RESUME ${mode.title}`}
-            </ActionButton>
-          ))}
+        {canResume() && (
+          <ActionButton className="primary wide" onClick={resumeGame}>
+            RESUME GAME
+          </ActionButton>
+        )}
       </div>
     </Dialog>
   );

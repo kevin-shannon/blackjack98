@@ -39,7 +39,7 @@ src/
   app/
     App.tsx                    Application composition
     trainingModes.ts           Mode menu metadata
-    ModeNavigation.tsx         Persistent, separate controllers and mode switching
+    ModeNavigation.tsx         Mode switching and a single resumable session
     ModeMenu.tsx               Shared mode selection and resume controls
   assets/
     cards.ts                   Original 53 base64 card images
@@ -113,13 +113,13 @@ Dialogs now retain React-controlled fields while sliders move, keep keyboard foc
 
 Choose Basic Strategy from the main menu, set DAS, H17, late surrender, difficulty, and optional timed hands, then start. Every question deals two player cards and one dealer upcard. One action is graded immediately and the correct action is highlighted. Correct answers advance after 1.1 seconds. Mistakes and timeouts open a small explanation window and wait for Next hand. No hand plays out.
 
-Both drill modes offer Skip explanations, off by default, in setup and Options. Enable it to hide mistake explanations and advance after the same short feedback delay. The preference is saved separately for each mode. The explanation window is centered over the felt between the dealer and player areas on desktop and mobile, keeping cards unobscured. Feedback uses the highlighted answer buttons and explanation window, without a status box. Menus and switching modes preserve a pending review; Next hand is the only way to continue unless the user enables Skip explanations or changes the session's rules, difficulty, or practice set.
+Both drill modes offer Skip explanations, off by default, in setup and Options. Enable it to hide mistake explanations and advance after the same short feedback delay. The preference is saved separately for each mode. The explanation window is centered over the felt between the dealer and player areas on desktop and mobile, keeping cards unobscured. Feedback uses the highlighted answer buttons and explanation window, without a status box. Opening the menu preserves a pending review; Next hand continues it. Selecting a different mode discards the previous run, including pending reviews.
 
 Normal gives every physical card a 1/52 chance on each draw, with replacement; ten-valued ranks retain their natural combined probability of 4/13. Naturals are skipped because they have no initial decision. Difficult samples uniformly from the [rule-specific edge-case cells](docs/basic-strategy-edge-cases.md), with replacement, then varies the card composition, order, suits, and ten-valued ranks. A cell qualifies if its correct action differs from an immediately adjacent dealer upcard or player total within the same hand family. Pairs compare dealer upcards only. Both difficulties continue indefinitely.
 
 Grading uses standard total-dependent multi-deck strategy with dealer peek, doubling on any first two cards, and the selected rules, based on [Michael Shackleford's strategy reference](https://wizardofodds.com/games/blackjack/strategy/4-decks/). Deck composition and card-count deviations are not used. The Difficult pool is derived from the grading function in `model/difficultHands.ts` and follows changes to table rules.
 
-Accuracy is correct answers divided by all attempts. Timeouts count as incorrect. Streaks, misses, and timeout counts are recorded only in this mode's `BasicStrategyStats`; Free Play keeps its own `FreePlayStats` with net return, rounds, and hand outcomes. Each mode's controller remains alive when switching screens and can be resumed from the menu. Menus and switching away pause the trainer's decision and feedback clocks. A new session resets only the selected mode. Statistics remain in memory until page reload; no account or server persistence is added.
+Accuracy is correct answers divided by all attempts. Timeouts count as incorrect. Streaks, misses, and timeout counts are recorded only in this mode's `BasicStrategyStats`; Free Play keeps its own `FreePlayStats` with net return, rounds, and hand outcomes. The menu has a single Resume Game button for the current run. Opening menus pauses the trainer's decision and feedback clocks. Selecting a different mode discards the previous session, cancels pending timers or dealing, and clears its counters. Returning to that mode starts fresh; saved options remain available. Statistics remain in memory until page reload; no account or server persistence is added.
 
 Basic Strategy preferences, including difficulty, use `blackjack98-basic-strategy-v1`, independently of Free Play's existing storage key. Older preferences default to Normal. Changing a table rule during practice resets the Basic Strategy session: all counters and feedback are cleared, and a fresh hand starts under the new rules with a full decision timer. Difficulty changes skip the current unscored question and retain prior accuracy. Keyboard shortcuts match Free Play: H/S/D/P/R.
 
@@ -129,7 +129,7 @@ Choose H17 or S17 and practice the Illustrious 18, Fab 4, or both. Each question
 
 Indices use the six-deck, dealer-peek convention documented in [the deviation reference](docs/deviations.md), with doubling on any initial two cards. Player card compositions, order, ten-valued ranks, and suits vary without changing the decision being tested. Insurance is included in the 18 and uses Take insurance / Decline insurance actions, including I/N shortcuts. Other hands use H/S/D/P and R when surrender applies. The index is revealed only in mistake explanations.
 
-Illustrious 18 questions explicitly assume no surrender; Fab 4 questions explicitly offer late surrender. This avoids conflicting answers on overlapping hands such as 15 vs 10. Deviations has its own `DeviationsStats` and `blackjack98-deviations-v1` preferences. Timed questions and menus behave like Basic Strategy. Changing table rules or the practice set resets only the Deviations session; other modes retain their results. The shared practice screen and lifecycle live in `features/training`, while index data, dealing, grading, and settings remain in `features/deviations`.
+Illustrious 18 questions explicitly assume no surrender; Fab 4 questions explicitly offer late surrender. This avoids conflicting answers on overlapping hands such as 15 vs 10. Deviations has its own `DeviationsStats` and `blackjack98-deviations-v1` preferences. Timed questions and menus behave like Basic Strategy. Changing table rules or the practice set resets the Deviations session. Switching modes discards the current run while retaining each mode's saved preferences. The shared practice screen and lifecycle live in `features/training`, while index data, dealing, grading, and settings remain in `features/deviations`.
 
 ## Adding features later
 

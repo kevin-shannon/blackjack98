@@ -180,56 +180,54 @@ test('changing table rules mid-run resets Basic Strategy accuracy, streaks, and 
   ).toBeChecked();
 });
 
-test('mode switches, resumes, and new sessions keep both modes stats separate', async ({
+test('keeps one resume button and starts fresh when switching between Free Play and Basic Strategy', async ({
   page,
 }) => {
   await page.addInitScript(() => {
     Math.random = () => 0.4;
   });
   await page.goto('/');
+  await expect(page.getByRole('button', { name: /^RESUME / })).toHaveCount(0);
   await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await page.getByRole('button', { name: 'START FREE PLAY' }).click();
+  const freshStats = await page.locator('.session-stats').innerText();
+  const startingBankroll = await page
+    .getByLabel('Current bankroll')
+    .locator('.bankvalue')
+    .innerText();
   await page.getByRole('button', { name: 'DEAL CARDS' }).click();
   await expect(
     page.getByRole('button', { name: 'STAND', exact: true }),
   ).toBeEnabled();
   await page.getByRole('button', { name: 'STAND', exact: true }).click();
   await expect(page.getByRole('button', { name: 'DEAL AGAIN' })).toBeEnabled();
-  const freeStats = await page.locator('.session-stats').innerText();
-  const bankroll = await page
-    .getByLabel('Current bankroll')
-    .locator('.bankvalue')
-    .innerText();
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
   await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
   await page.getByRole('button', { name: 'Split', exact: true }).click();
+  await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
+  await expect(page.getByRole('button', { name: /^RESUME / })).toHaveCount(1);
+  await page.getByRole('button', { name: 'RESUME GAME', exact: true }).click();
   await expect(page.getByLabel('Basic Strategy accuracy')).toContainText(
     '100.0%',
   );
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'RESUME FREE PLAY', exact: true })
-    .click();
-  await expect(page.locator('.session-stats')).toHaveText(freeStats);
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
+  await page.getByRole('button', { name: 'BACK' }).click();
+  await expect(page.getByRole('button', { name: /^RESUME / })).toHaveCount(0);
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
+  await page.getByRole('button', { name: 'START FREE PLAY' }).click();
+  await expect(page.locator('.session-stats')).toHaveText(freshStats);
   await expect(
     page.getByLabel('Current bankroll').locator('.bankvalue'),
-  ).toHaveText(bankroll);
-  await page.getByRole('button', { name: 'New Session', exact: true }).click();
-  await page.getByRole('button', { name: 'RESET', exact: true }).click();
+  ).toHaveText(startingBankroll);
+  await expect(page.getByLabel('Current round')).toHaveText('ROUND 01');
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'RESUME BASIC STRATEGY', exact: true })
-    .click();
-  await expect(page.getByLabel('Basic Strategy accuracy')).toContainText(
-    '100.0%',
-  );
+  await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
+  await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
   await expect(page.locator('.strategy-session-stats')).toContainText(
-    'CORRECT 1 / 1',
+    'CORRECT 0 / 0',
   );
-  await page.getByRole('button', { name: 'New Session', exact: true }).click();
-  await page.getByRole('button', { name: 'RESET', exact: true }).click();
-  await expect(page.getByLabel('Basic Strategy accuracy')).toContainText('—');
 });
 
 test('timed questions pause in menus and score a timeout once before advancing', async ({

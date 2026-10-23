@@ -104,10 +104,7 @@ export function StrategyDialogs() {
     return (
       <Dialog key="strategy-reset" title="Blackjack 98 — New Strategy Session">
         <h2>NEW SESSION?</h2>
-        <p>
-          Reset Basic Strategy accuracy and streaks and start a new hand. Your
-          Free Play session is kept separately.
-        </p>
+        <p>Reset Basic Strategy accuracy and streaks and start a new hand.</p>
         <div className="modal-actions">
           <ActionButton onClick={trainer.closePanel}>CANCEL</ActionButton>
           <ActionButton className="primary" onClick={trainer.start}>

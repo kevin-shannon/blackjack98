@@ -270,6 +270,19 @@ export function createDecisionTrainer<
     canAnswer,
     updateRule,
     updateOption,
+    discardSession() {
+      active = false;
+      deadline = 0;
+      remaining = 0;
+      draft = null;
+      state.started = false;
+      state.panel = 'menu';
+      state.phase = 'idle';
+      state.question = null;
+      state.feedback = null;
+      state.stats = createPracticeStats(config.modeId);
+      publish();
+    },
     suspend() {
       pause();
       active = false;

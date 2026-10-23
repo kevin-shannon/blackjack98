@@ -28,6 +28,6 @@ Insurance remains part of the Illustrious 18. It shows an Ace upcard and random 
 
 One answer is graded and the correct action is highlighted. Correct answers advance after 1.1 seconds. By default, mistakes and timeouts show the threshold explanation in a small window centered over the felt between the dealer and player areas, keeping cards unobscured on desktop and mobile. The window waits for Next hand. There is no separate status box. Skip explanations hides the window and advances automatically after the short feedback delay. The preference defaults to off and is saved separately for this mode.
 
-Menus and switching away pause both the decision and feedback timers and preserve manual reviews without advancing. Repeated questions are allowed. The mode keeps only its current question and counters, so the session can continue indefinitely.
+Opening a menu pauses both timers and preserves manual reviews without advancing. Resume Game returns to the current run. Selecting another mode discards this session and its timers; revisiting Deviations starts fresh with the saved preferences. Repeated questions are allowed. The mode keeps only its current question and counters, so the session can continue indefinitely.
 
 Accuracy, streaks, misses, and timeouts use a separate `modeId: 'deviations'` stats record. Settings use `blackjack98-deviations-v1`. Setup changes remain drafts until Start. Changing the dealer rule or practice set during a run clears this mode's stats and feedback and deals a new question with a full decision timer.

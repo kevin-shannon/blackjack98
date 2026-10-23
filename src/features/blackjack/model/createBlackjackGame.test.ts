@@ -60,6 +60,44 @@ describe('card values', () => {
   });
 });
 describe('rounds and payouts', () => {
+  it('discards an unfinished session and cancels stale dealing without clearing preferences', async () => {
+    const { game, state, completed } = scenario(['10', '6', '9', '8']);
+    const { options, rules } = game.getSnapshot();
+    const dealing = game.deal();
+    await vi.advanceTimersByTimeAsync(100);
+    game.discardSession();
+    await finish(dealing);
+    expect(state()).toMatchObject({
+      modeStarted: false,
+      panel: 'menu',
+      phase: 'betting',
+      busy: false,
+      hands: [],
+      dealer: [],
+      insuranceBet: 0,
+      runningCount: 0,
+      round: 1,
+      bankroll: options.startingBankroll,
+      stats: {
+        completedRounds: 0,
+        sessionNet: 0,
+        wins: 0,
+        losses: 0,
+        pushes: 0,
+      },
+    });
+    expect(game.getSnapshot()).toMatchObject({
+      options,
+      rules,
+      shoeRemaining: 0,
+    });
+    expect(completed).not.toHaveBeenCalled();
+    expect(game.canBet()).toBe(false);
+    game.configureFreePlay();
+    game.startFreePlay();
+    expect(state().modeStarted).toBe(true);
+    expect(game.canBet()).toBe(true);
+  });
   it.each([
     ['3:2', 1037.5],
     ['6:5', 1030],
