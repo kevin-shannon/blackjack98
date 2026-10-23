@@ -23,9 +23,6 @@
 .freeplay-controls .action-panel {
   min-height: auto;
 }
-.freeplay-controls .action-buttons {
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-}
 .felt-wagers {
   --chip-size: 48px;
   --chip-button-size: 56px;
@@ -88,9 +85,6 @@
   }
 }
 @media (pointer: coarse), (max-width: 760px) {
-  .freeplay-controls .action-buttons {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .felt-wagers .wager-clear {
     height: 44px;
   }

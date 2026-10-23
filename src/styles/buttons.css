@@ -72,9 +72,50 @@
 /* Retain generous tap targets on phones and other touch devices. */
 @media (pointer: coarse), (max-width: 760px) {
   .action-btn,
+  .action-btn.primary,
+  .action-btn.safe,
+  .action-btn.danger,
   .settings-actions .action-btn,
   .menu-utilities .action-btn,
   .practice-review .action-btn {
     height: 44px;
+  }
+}
+.freeplay-controls .action-buttons,
+.strategy-actions {
+  display: flex;
+  gap: 8px;
+}
+.freeplay-controls .action-buttons .action-btn,
+.strategy-actions .action-btn {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .freeplay-controls .action-buttons,
+  .strategy-actions {
+    gap: 4px;
+  }
+  .freeplay-controls .action-buttons .action-btn,
+  .strategy-actions .action-btn {
+    height: 32px;
+    padding-inline: 2px;
+    font-size: 11px;
+  }
+  .strategy-correct-action::before,
+  .strategy-wrong-action::before {
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    margin: 0;
+    font-size: 9px;
+  }
+}
+@media (max-width: 460px) {
+  .freeplay-controls .action-buttons .action-btn,
+  .strategy-actions .action-btn {
+    padding-inline: 1px;
+    font-size: 10px;
   }
 }

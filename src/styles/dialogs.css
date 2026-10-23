@@ -1,0 +1,19 @@
+.modal {
+  padding-top: 38px;
+}
+.modal::before,
+.practice-review-title {
+  height: 24px;
+  padding: 3px 6px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modal::before {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+}

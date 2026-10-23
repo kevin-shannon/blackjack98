@@ -9,6 +9,7 @@ import './styles/deviations.css';
 import './styles/buttons.css';
 import './styles/cards.css';
 import './styles/wagers.css';
+import './styles/dialogs.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

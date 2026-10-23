@@ -83,7 +83,7 @@
     .quiz-input input{height:48px;border:2px solid;border-color:#555 #fff #fff #555;background:#fff;color:#000080;font-size:25px;font-weight:900;text-align:center}
     .quiz-feedback{text-align:center;padding:14px;font-weight:900;font-size:20px;border:2px solid #333;margin-bottom:12px}
     .quiz-feedback.correct{background:#22aa48;color:white}.quiz-feedback.incorrect{background:#d32828;color:white}
-    @media(max-width:570px){.app{margin:5px}.menubar{gap:1px}.menu-item{padding:6px 7px;font-size:11px}.menu-caption{display:none}.modal{padding:50px 12px 14px}.mode-symbol{font-size:12px;max-width:71px}.mode-tile strong{font-size:17px}.mode-tile small{font-size:10px}.menu-utilities .action-btn{flex:1 0 42%}.topbar{height:auto;min-height:50px}.rules{line-height:1.4}.chip.selected{outline-offset:3px;outline-width:2px}.chips{gap:9px}.chip{font-size:9px;border-width:4px}}
+    @media(max-width:570px){.app{margin:5px}.menubar{gap:1px}.menu-item{padding:6px 7px;font-size:11px}.menu-caption{display:none}.modal{padding:50px 12px 14px}.mode-symbol{font-size:12px;max-width:71px}.mode-tile strong{font-size:17px}.mode-tile small{font-size:10px}.menu-utilities .action-btn{flex:1 0 42%}.rules{line-height:1.4}.chip.selected{outline-offset:3px;outline-width:2px}.chips{gap:9px}.chip{font-size:9px;border-width:4px}}
     @media(max-width:385px){.menu-item{font-size:10px;padding:5px}.chip{font-size:8px}.modal-actions.stack-mobile{flex-direction:column}}
 
     body.modal-open{overflow:hidden}
