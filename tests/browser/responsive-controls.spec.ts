@@ -35,6 +35,14 @@ for (const mode of ['FREE PLAY', 'BASIC STRATEGY', 'DEVIATIONS']) {
         width <= 460 ? '30px' : '32px',
       );
       if (mode === 'FREE PLAY') {
+        const title = (await page.locator('.heading-line h1').boundingBox())!;
+        const rules = (await page
+          .locator('.heading-line .rules')
+          .boundingBox())!;
+        expect(rules.y).toBeLessThan(title.y + title.height);
+        expect(rules.x).toBeGreaterThan(title.x + title.width);
+      }
+      if (mode === 'FREE PLAY') {
         await page.getByRole('button', { name: 'Add $25 to bet' }).click();
         await page.getByRole('button', { name: 'Deal cards' }).click();
         await expect(

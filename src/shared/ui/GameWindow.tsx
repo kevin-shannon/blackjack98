@@ -75,9 +75,9 @@ export function GameWindow({
       </nav>
       <div className="heading-line">
         <div>
-          <div className="eyebrow mode-label">
-            {started ? 'NOW PLAYING' : 'SELECT A GAME MODE'}
-          </div>
+          {!started && (
+            <div className="eyebrow mode-label">SELECT A GAME MODE</div>
+          )}
           <h1>{started ? title : 'BLACKJACK!'}</h1>
         </div>
         <div className="rules">{rulesSummary}</div>

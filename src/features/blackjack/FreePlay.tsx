@@ -15,7 +15,7 @@ export function FreePlay() {
         started={state.modeStarted}
         modalOpen={Boolean(state.panel)}
         title="FREE PLAY"
-        rulesSummary={`${rules.decks} ${rules.decks === 1 ? 'DECK' : 'DECKS'} · ${rules.hitSoft17 ? 'HIT' : 'STAND'} SOFT 17 · ${rules.payout} PAYOUT`}
+        rulesSummary={`${rules.decks} ${rules.decks === 1 ? 'DECK' : 'DECKS'} · ${rules.hitSoft17 ? 'HIT' : 'STAND'} SOFT 17`}
         onMenu={() => game.openPanel('menu')}
         onReset={() => game.openPanel('reset')}
         onRules={() => game.openPanel('rules')}

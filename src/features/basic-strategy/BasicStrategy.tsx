@@ -23,8 +23,7 @@ export function BasicStrategy() {
         title="BASIC STRATEGY"
         name="Basic Strategy"
         rulesSummary={[
-          'INFINITE DECK',
-          settings.rules.hitSoft17 ? 'HIT SOFT 17' : 'STAND SOFT 17',
+          settings.rules.hitSoft17 ? 'H17' : 'S17',
           settings.rules.doubleAfterSplit ? 'DAS' : 'NO DAS',
           ...(settings.rules.surrender ? ['SURRENDER'] : []),
         ].join(' \u00b7 ')}
