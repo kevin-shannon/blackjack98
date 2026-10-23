@@ -77,7 +77,6 @@ export interface GameSnapshot {
   rules: TableRules;
   roundRules: TableRules;
   options: GameOptions;
-  selectedChip: number;
   draftRules: TableRules | null;
   draftOptions: GameOptions | null;
   shoeRemaining: number;

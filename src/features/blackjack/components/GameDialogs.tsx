@@ -1,8 +1,8 @@
+import { SettingsActions } from '../../../shared/ui/SettingsActions';
 import { useBlackjack } from '../hooks/useBlackjack';
 import { Dialog } from '../../../shared/ui/Dialog';
 import { ActionButton } from '../../../shared/ui/ActionButton';
 import { RuleFields, OptionFields } from '../../settings/SettingsFields';
-import { money } from '../../../shared/lib/format';
 import { ModeMenu } from '../../../app/ModeMenu';
 export function GameDialogs() {
   const { game, state, rules, options, draftRules, draftOptions } =
@@ -54,14 +54,15 @@ export function GameDialogs() {
         key="rules"
         title="Blackjack 98 — Table Rules"
         className="settings-modal"
+        onCancel={game.closePanel}
       >
         <h2>TABLE RULES</h2>
         <div className="setting-hint">
-          Changes cancel any round in progress and refund all wagers. A fresh
-          shoe starts with the updated rules.
+          Applying rule changes cancels any round in progress and refund all
+          wagers. A fresh shoe starts with the updated rules.
         </div>
         <div className="settings-form">
-          <RuleFields rules={rules} onChange={game.updateRule} />
+          <RuleFields rules={draftRules || rules} onChange={game.updateRule} />
         </div>
         <Close />
       </Dialog>
@@ -72,6 +73,7 @@ export function GameDialogs() {
         key="options"
         title="Blackjack 98 — Game Options"
         className="settings-modal"
+        onCancel={game.closePanel}
       >
         <h2>GAME OPTIONS</h2>
         <div className="setting-hint">
@@ -80,7 +82,10 @@ export function GameDialogs() {
           exposed cards since the last shuffle.
         </div>
         <div className="settings-form">
-          <OptionFields options={options} onChange={game.updateOption} />
+          <OptionFields
+            options={draftOptions || options}
+            onChange={game.updateOption}
+          />
         </div>
         <Close />
       </Dialog>
@@ -103,7 +108,12 @@ export function GameDialogs() {
     );
   if (state.panel === 'help')
     return (
-      <Dialog key="help" title="Blackjack 98 — Help" className="settings-modal">
+      <Dialog
+        key="help"
+        title="Blackjack 98 — Help"
+        className="settings-modal"
+        onCancel={game.closePanel}
+      >
         <h2>HOW TO PLAY</h2>
         <ul className="rules-list">
           <li>Get closer to 21 than the dealer without busting.</li>
@@ -137,46 +147,18 @@ export function GameDialogs() {
         </div>
       </Dialog>
     );
-  if (state.phase === 'insurance') {
-    const amount = state.bet / 2,
-      afford = state.bankroll >= amount;
-    return (
-      <Dialog key="insurance" title="Blackjack 98 — Insurance">
-        <div className="eyebrow">Dealer shows an Ace</div>
-        <h2>TAKE INSURANCE?</h2>
-        <p>Insurance pays 2:1 if the dealer has blackjack.</p>
-        <div className="modal-amount">
-          {money(amount)} <span className="muted-inline">SIDE BET</span>
-        </div>
-        <div className="modal-actions">
-          <ActionButton onClick={() => void game.insure(false)}>
-            NO THANKS
-          </ActionButton>
-          <ActionButton
-            className="primary"
-            disabled={!afford}
-            onClick={() => void game.insure(true)}
-          >
-            INSURE
-          </ActionButton>
-        </div>
-        {!afford && (
-          <div className="modal-small">
-            Not enough money for full insurance.
-          </div>
-        )}
-      </Dialog>
-    );
-  }
   return null;
 }
 function Close() {
-  const { game } = useBlackjack();
+  const { game, rules, options, draftRules, draftOptions } = useBlackjack();
   return (
-    <div className="modal-actions bottom-actions">
-      <ActionButton className="primary wide" onClick={game.closePanel}>
-        CLOSE
-      </ActionButton>
-    </div>
+    <SettingsActions
+      dirty={
+        JSON.stringify(draftRules) !== JSON.stringify(rules) ||
+        JSON.stringify(draftOptions) !== JSON.stringify(options)
+      }
+      onApply={game.applySettings}
+      onClose={game.closePanel}
+    />
   );
 }

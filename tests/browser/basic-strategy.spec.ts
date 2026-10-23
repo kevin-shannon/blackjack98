@@ -128,7 +128,7 @@ test('Difficult deals edge cases continuously and changing back to Normal retain
   await expect(page.locator('.strategy-hand .score-pill')).toHaveText('16');
   await page.getByRole('button', { name: 'Options', exact: true }).click();
   await page.getByRole('radio', { name: 'Normal', exact: false }).check();
-  await page.getByRole('button', { name: 'CLOSE', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('.strategy-hand .score-pill')).toHaveText('12');
   await page.getByRole('button', { name: 'Split', exact: true }).click();
   await expect(
@@ -158,7 +158,7 @@ test('changing table rules mid-run resets Basic Strategy accuracy, streaks, and 
   );
   await page.getByRole('button', { name: 'Table Rules', exact: true }).click();
   await page.getByRole('checkbox', { name: 'Dealer hits soft 17' }).check();
-  await page.getByRole('button', { name: 'CLOSE', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('.strategy-session-stats')).toHaveText(
     /^CORRECT 0 \/ 0\s*· STREAK 0\s*· BEST 0$/,
   );
@@ -195,12 +195,12 @@ test('keeps one resume button and starts fresh when switching between Free Play 
     .getByLabel('Current bankroll')
     .locator('.bankvalue')
     .innerText();
-  await page.getByRole('button', { name: 'DEAL CARDS' }).click();
+  await page.getByRole('button', { name: 'Deal cards' }).click();
   await expect(
-    page.getByRole('button', { name: 'STAND', exact: true }),
+    page.getByRole('button', { name: 'Stand', exact: true }),
   ).toBeEnabled();
-  await page.getByRole('button', { name: 'STAND', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'DEAL AGAIN' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Stand', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Deal again' })).toBeEnabled();
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
   await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
@@ -221,7 +221,8 @@ test('keeps one resume button and starts fresh when switching between Free Play 
   await expect(
     page.getByLabel('Current bankroll').locator('.bankvalue'),
   ).toHaveText(startingBankroll);
-  await expect(page.getByLabel('Current round')).toHaveText('ROUND 01');
+  await expect(page.getByLabel('Current round')).toHaveCount(0);
+  await expect(page.getByLabel('Bet controls')).toBeVisible();
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
   await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();

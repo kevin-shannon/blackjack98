@@ -1,3 +1,6 @@
+.settings-modal {
+  padding-bottom: 15px;
+}
 .checkbox-row input[type='checkbox']:checked::after {
   content: '';
   position: absolute;

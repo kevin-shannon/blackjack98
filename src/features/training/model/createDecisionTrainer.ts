@@ -161,10 +161,15 @@ export function createDecisionTrainer<
   }
   function openPanel(panel: Exclude<PracticePanel, null>) {
     pause();
+    draft =
+      panel === 'rules' || panel === 'options'
+        ? structuredClone(settings)
+        : null;
     state.panel = panel;
     publish();
   }
   function closePanel() {
+    draft = null;
     if (!state.started) {
       backToMenu();
       return;
@@ -197,11 +202,59 @@ export function createDecisionTrainer<
     state.stats = createPracticeStats(config.modeId);
     nextQuestion();
   }
+  function applySettings() {
+    if (!draft || (state.panel !== 'rules' && state.panel !== 'options'))
+      return;
+    const previous = settings;
+    settings = config.parseSettings(draft);
+    const rulesChanged =
+      JSON.stringify(previous.rules) !== JSON.stringify(settings.rules);
+    const changedOptions = (
+      Object.keys(settings.options) as (keyof Options)[]
+    ).filter((key) => previous.options[key] !== settings.options[key]);
+    if (!rulesChanged && changedOptions.length === 0) return;
+    repository.save(settings);
+    draft = structuredClone(settings);
+    if (
+      state.started &&
+      (rulesChanged ||
+        changedOptions.some((key) => config.optionChange(key) === 'reset'))
+    ) {
+      resetSession();
+      return;
+    }
+    if (
+      state.started &&
+      changedOptions.some(
+        (key) =>
+          key !== 'skipExplanations' && config.optionChange(key) !== 'timer',
+      )
+    ) {
+      nextQuestion();
+      return;
+    }
+    if (
+      changedOptions.includes('skipExplanations') &&
+      state.feedback &&
+      !state.feedback.correct
+    ) {
+      state.phase = settings.options.skipExplanations ? 'feedback' : 'review';
+      remaining = FEEDBACK_MS;
+      deadline = 0;
+    } else if (
+      state.phase === 'answering' &&
+      changedOptions.some((key) => key === 'timedHands' || key === 'seconds')
+    ) {
+      deadline = 0;
+      remaining = settings.options.seconds * 1000;
+    }
+    publish();
+  }
   function updateRule<K extends keyof Rules>(key: K, value: Rules[K]) {
-    const target = state.panel === 'setup' ? draft : settings;
+    const target = draft ?? settings;
     if (!target || target.rules[key] === value) return;
     target.rules[key] = value;
-    if (state.panel !== 'setup') {
+    if (!draft) {
       repository.save(settings);
       if (state.started) {
         resetSession();
@@ -211,10 +264,10 @@ export function createDecisionTrainer<
     publish();
   }
   function updateOption<K extends keyof Options>(key: K, value: Options[K]) {
-    const target = state.panel === 'setup' ? draft : settings;
+    const target = draft ?? settings;
     if (!target || target.options[key] === value) return;
     target.options[key] = value;
-    if (state.panel !== 'setup') {
+    if (!draft) {
       settings = config.parseSettings(settings);
       repository.save(settings);
       if (key === 'skipExplanations') {
@@ -263,6 +316,7 @@ export function createDecisionTrainer<
     configure,
     openPanel,
     closePanel,
+    applySettings,
     backToMenu,
     start,
     answer,

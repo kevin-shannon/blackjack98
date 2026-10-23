@@ -6,6 +6,9 @@ import './styles/settings.css';
 import './styles/basic-strategy.css';
 import './styles/training.css';
 import './styles/deviations.css';
+import './styles/buttons.css';
+import './styles/cards.css';
+import './styles/wagers.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

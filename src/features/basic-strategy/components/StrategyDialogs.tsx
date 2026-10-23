@@ -1,3 +1,4 @@
+import { SettingsActions } from '../../../shared/ui/SettingsActions';
 import { ModeMenu } from '../../../app/ModeMenu';
 import { Dialog } from '../../../shared/ui/Dialog';
 import { ActionButton } from '../../../shared/ui/ActionButton';
@@ -61,16 +62,18 @@ export function StrategyDialogs() {
         key="strategy-rules"
         title="Blackjack 98 — Basic Strategy Rules"
         className="settings-modal"
+        onCancel={trainer.closePanel}
       >
         <h2>TABLE RULES</h2>
         <div className="setting-hint">
           Practice uses standard multi-deck basic strategy with dealer peek and
-          doubling on any two starting cards. Changing a table rule starts a new
-          session, resetting accuracy, streaks, and all practice counters.
+          doubling on any two starting cards. Applying a table rule change
+          starts a new session, resetting accuracy, streaks, and all practice
+          counters.
         </div>
         <div className="settings-form">
           <StrategyRuleFields
-            rules={settings.rules}
+            rules={(draft || settings).rules}
             onChange={trainer.updateRule}
           />
         </div>
@@ -83,6 +86,7 @@ export function StrategyDialogs() {
         key="strategy-options"
         title="Blackjack 98 — Basic Strategy Options"
         className="settings-modal"
+        onCancel={trainer.closePanel}
       >
         <h2>GAME OPTIONS</h2>
         <div className="setting-hint">
@@ -93,7 +97,7 @@ export function StrategyDialogs() {
         </div>
         <div className="settings-form">
           <StrategyOptionFields
-            options={settings.options}
+            options={(draft || settings).options}
             onChange={trainer.updateOption}
           />
         </div>
@@ -119,6 +123,7 @@ export function StrategyDialogs() {
         key="strategy-help"
         title="Blackjack 98 — Basic Strategy Help"
         className="settings-modal"
+        onCancel={trainer.closePanel}
       >
         <h2>HOW TO PRACTICE</h2>
         <ul className="rules-list">
@@ -165,12 +170,12 @@ export function StrategyDialogs() {
   return null;
 }
 function Close() {
-  const { trainer } = useStrategyTrainer();
+  const { trainer, settings, draft } = useStrategyTrainer();
   return (
-    <div className="modal-actions bottom-actions">
-      <ActionButton className="primary wide" onClick={trainer.closePanel}>
-        CLOSE
-      </ActionButton>
-    </div>
+    <SettingsActions
+      dirty={JSON.stringify(draft) !== JSON.stringify(settings)}
+      onApply={trainer.applySettings}
+      onClose={trainer.closePanel}
+    />
   );
 }

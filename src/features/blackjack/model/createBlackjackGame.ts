@@ -48,7 +48,6 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
   const persisted = repository.load();
   let rules = { ...persisted.rules },
     options = { ...persisted.options };
-  let selectedChip = persisted.chip;
   let shoe: Pick<Card, 'rank' | 'suit'>[] = [],
     shoeDecks = 0,
     cardId = 0,
@@ -72,7 +71,6 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
       rules: { ...rules },
       roundRules: { ...roundRules },
       options: { ...options },
-      selectedChip,
       draftRules: draftRules && { ...draftRules },
       draftOptions: draftOptions && { ...draftOptions },
       shoeRemaining: shoe.length,
@@ -91,7 +89,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     listeners.forEach((listener) => listener());
   }
   function saveSettings() {
-    repository.save({ rules, options, chip: selectedChip });
+    repository.save({ rules, options, chip: persisted.chip });
   }
   const state: GameState = {
     stats: createFreePlayStats(),
@@ -157,6 +155,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
   function canBet() {
     return (
       state.modeStarted &&
+      !state.panel &&
       (state.phase === 'betting' || state.phase === 'roundOver') &&
       !state.busy
     );
@@ -203,15 +202,18 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     );
   }
   function normalizeBet(amount: number | string) {
-    if (state.bankroll < state.minBet) return 0;
     const limit = Math.min(state.maxBet, Math.floor(state.bankroll / 5) * 5);
     const n = Number.isFinite(Number(amount)) ? Number(amount) : state.bet;
-    return clamp(Math.round(n / 5) * 5, state.minBet, limit);
+    return clamp(Math.round(n / 5) * 5, 0, limit);
   }
   function setBet(n: number | string) {
     if (!canBet()) return;
     state.bet = normalizeBet(n);
     render();
+  }
+  function addChip(chip: number) {
+    if (!CHIPS.some((value) => value === chip)) return;
+    setBet(state.bet + chip);
   }
   function activeTimer() {
     return options.timedHands && state.phase === 'playing' && state.modeStarted;
@@ -267,7 +269,8 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     state.lastDealtId = null;
   }
   async function startRound() {
-    if (!canBet() || state.bankroll < state.minBet || state.panel) return;
+    if (!canBet() || state.bankroll < state.minBet || state.bet < state.minBet)
+      return;
     if (state.phase === 'roundOver') state.round++;
     if (needsShuffle()) makeShoe();
     roundRules = { ...rules };
@@ -291,7 +294,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     if (state.dealer[0].rank === 'A') {
       state.phase = 'insurance';
       state.busy = false;
-      state.message = 'Dealer shows an Ace. Insurance?';
+      state.message = `Dealer shows an Ace. Insurance costs ${money(state.bet / 2)} and pays 2:1.${state.bankroll < state.bet / 2 ? ' Not enough bankroll for insurance.' : ''}`;
       render();
     } else await peekAndContinue();
   }
@@ -546,7 +549,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     state.bankroll = options.startingBankroll;
     state.minBet = options.minBet;
     state.maxBet = options.maxBet;
-    state.bet = normalizeBet(25);
+    state.bet = normalizeBet(Math.max(25, state.minBet));
     state.phase = 'betting';
     state.busy = false;
     state.dealer = [];
@@ -594,13 +597,17 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     return true;
   }
   function openPanel(name: Exclude<Panel, null>) {
-    if (state.phase === 'insurance') return;
     if (state.panel === name) return;
     pauseTimer();
+    draftRules = name === 'rules' || name === 'options' ? { ...rules } : null;
+    draftOptions =
+      name === 'rules' || name === 'options' ? { ...options } : null;
     state.panel = name;
     render();
   }
   function closePanel() {
+    draftRules = null;
+    draftOptions = null;
     if (!state.modeStarted) {
       backToMenu();
       return;
@@ -634,7 +641,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     key: K,
     nextValue: TableRules[K],
   ) {
-    const inSetup = state.panel === 'setup';
+    const inSetup = draftRules !== null;
     const object = inSetup ? draftRules : rules;
     if (!object || object[key] === nextValue) return;
     object[key] = nextValue;
@@ -649,7 +656,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     key: K,
     nextValue: GameOptions[K],
   ) {
-    const inSetup = state.panel === 'setup';
+    const inSetup = draftOptions !== null;
     const object = inSetup ? draftOptions : options;
     if (!object || object[key] === nextValue) return;
     object[key] = nextValue;
@@ -677,9 +684,31 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     }
     render();
   }
-  function selectChip(chip: number) {
-    if (!CHIPS.some((n) => n === chip)) return;
-    selectedChip = chip;
+  function applySettings() {
+    if (
+      !draftRules ||
+      !draftOptions ||
+      (state.panel !== 'rules' && state.panel !== 'options')
+    )
+      return;
+    const rulesChanged = JSON.stringify(rules) !== JSON.stringify(draftRules);
+    if (
+      !rulesChanged &&
+      JSON.stringify(options) === JSON.stringify(draftOptions)
+    )
+      return;
+    const timerChanged =
+      options.timedHands !== draftOptions.timedHands ||
+      options.seconds !== draftOptions.seconds;
+    rules = { ...draftRules };
+    options = { ...draftOptions };
+    if (rulesChanged) {
+      cancelRoundForRuleChange();
+      makeShoe();
+    } else if (timerChanged && state.phase === 'playing' && !state.busy) {
+      if (options.timedHands) startTimer();
+      else stopTimer();
+    }
     saveSettings();
     render();
   }
@@ -705,9 +734,10 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     act: (action: PlayerAction) => runRoundTask(act(action)),
     insure: (accept: boolean) => runRoundTask(decideInsurance(accept)),
     setBet,
-    selectChip,
+    addChip,
     openPanel,
     closePanel,
+    applySettings,
     configureFreePlay,
     backToMenu,
     startFreePlay,

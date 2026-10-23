@@ -1,0 +1,80 @@
+/* Shared Windows-style command buttons, including table actions and dialogs. */
+.action-btn,
+.action-btn.primary,
+.action-btn.safe,
+.action-btn.danger {
+  height: 36px;
+  padding: 0 12px;
+  background: var(--chrome);
+  color: #000;
+  border-color: #fff #404040 #404040 #fff;
+  box-shadow:
+    inset -1px -1px #808080,
+    inset 1px 1px #dfdfdf;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  transition: none;
+}
+.action-btn:hover:not(:disabled) {
+  filter: none;
+}
+.action-btn:active:not(:disabled) {
+  border-color: #404040 #fff #fff #404040;
+  box-shadow: inset 1px 1px #808080;
+  transform: none;
+  padding-top: 2px;
+}
+.action-btn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -6px;
+}
+.action-btn:disabled {
+  opacity: 1;
+  filter: none;
+  color: #808080;
+  text-shadow: 1px 1px #fff;
+}
+.strategy-actions .strategy-correct-action:disabled,
+.strategy-actions .strategy-wrong-action:disabled {
+  background: var(--chrome);
+  color: #000;
+  text-shadow: none;
+}
+.strategy-actions .strategy-correct-action:disabled {
+  border-color: #404040 #fff #fff #404040;
+  box-shadow: inset 1px 1px #808080;
+  outline: 1px dotted #000;
+  outline-offset: -6px;
+}
+.strategy-correct-action::before,
+.strategy-wrong-action::before {
+  margin-right: 6px;
+  font-weight: 700;
+}
+.strategy-correct-action::before {
+  content: '\2713' / '';
+}
+.strategy-wrong-action::before {
+  content: '\00d7' / '';
+}
+.modal-actions.settings-actions {
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 16px;
+}
+.settings-actions .action-btn {
+  flex: 0 1 76px;
+  min-width: 0;
+  height: 28px;
+}
+/* Retain generous tap targets on phones and other touch devices. */
+@media (pointer: coarse), (max-width: 760px) {
+  .action-btn,
+  .settings-actions .action-btn,
+  .menu-utilities .action-btn,
+  .practice-review .action-btn {
+    height: 44px;
+  }
+}

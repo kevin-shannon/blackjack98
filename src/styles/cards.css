@@ -1,0 +1,26 @@
+/* Dealer and player cards share the same responsive dimensions. */
+.felt {
+  --card-width: 68px;
+  --card-height: 94px;
+}
+.felt .playing-card {
+  width: var(--card-width);
+  height: var(--card-height);
+  aspect-ratio: auto;
+}
+.felt .hand-slot {
+  --stack-card-w: var(--card-width);
+  --stack-card-h: var(--card-height);
+}
+@media (max-width: 760px) {
+  .felt {
+    --card-width: 62px;
+    --card-height: 87px;
+  }
+}
+@media (max-width: 460px) {
+  .felt {
+    --card-width: 53px;
+    --card-height: 75px;
+  }
+}

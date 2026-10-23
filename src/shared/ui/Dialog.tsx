@@ -5,11 +5,13 @@ export function Dialog({
   title,
   className = '',
   initialFocus = 'first-control',
+  onCancel,
   children,
 }: {
   title: string;
   className?: string;
   initialFocus?: 'first-control' | 'dialog';
+  onCancel?: () => void;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -37,6 +39,12 @@ export function Dialog({
           aria-label={title}
           tabIndex={-1}
           onKeyDown={(event) => {
+            if (event.key === 'Escape' && onCancel) {
+              event.preventDefault();
+              event.stopPropagation();
+              onCancel();
+              return;
+            }
             if (event.key !== 'Tab') return;
             const controls = [
               ...event.currentTarget.querySelectorAll<HTMLElement>(

@@ -3,7 +3,6 @@ import { useGameKeyboard } from './hooks/useGameKeyboard';
 import { money } from '../../shared/lib/format';
 import { GameWindow } from '../../shared/ui/GameWindow';
 import { BlackjackTable } from './components/BlackjackTable';
-import { BetControls } from './components/BetControls';
 import { TableActions } from './components/TableActions';
 import { GameDialogs } from './components/GameDialogs';
 
@@ -14,7 +13,7 @@ export function FreePlay() {
     <>
       <GameWindow
         started={state.modeStarted}
-        modalOpen={Boolean(state.panel || state.phase === 'insurance')}
+        modalOpen={Boolean(state.panel)}
         title="FREE PLAY"
         rulesSummary={`${rules.decks} ${rules.decks === 1 ? 'DECK' : 'DECKS'} · ${rules.hitSoft17 ? 'HIT' : 'STAND'} SOFT 17 · ${rules.payout} PAYOUT`}
         onMenu={() => game.openPanel('menu')}
@@ -35,8 +34,7 @@ export function FreePlay() {
         }
       >
         <BlackjackTable />
-        <div className="control-panel">
-          <BetControls />
+        <div className="control-panel freeplay-controls">
           <TableActions />
         </div>
       </GameWindow>

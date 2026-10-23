@@ -117,7 +117,7 @@ test('uses H17 Fab 4 indices, resets on rule changes, and saves preferences sepa
   await expect(page.getByLabel('Deviations accuracy')).toContainText('100.0%');
   await page.getByRole('button', { name: 'Table Rules', exact: true }).click();
   await page.getByRole('radio', { name: 'H17', exact: false }).check();
-  await page.getByRole('button', { name: 'CLOSE', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.getByLabel('True count')).toHaveText('TRUE COUNT-1');
   await expect(page.locator('.strategy-session-stats')).toContainText(
     'CORRECT 0 / 0',

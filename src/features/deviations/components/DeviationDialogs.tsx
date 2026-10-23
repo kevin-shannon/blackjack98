@@ -1,3 +1,4 @@
+import { SettingsActions } from '../../../shared/ui/SettingsActions';
 import { ModeMenu } from '../../../app/ModeMenu';
 import { Dialog } from '../../../shared/ui/Dialog';
 import { ActionButton } from '../../../shared/ui/ActionButton';
@@ -53,16 +54,20 @@ export function DeviationDialogs() {
     );
   if (state.panel === 'rules')
     return (
-      <Dialog title="Blackjack 98 — Deviation Rules" className="settings-modal">
+      <Dialog
+        title="Blackjack 98 — Deviation Rules"
+        className="settings-modal"
+        onCancel={trainer.closePanel}
+      >
         <h2>TABLE RULES</h2>
         <div className="setting-hint">
-          Changing the dealer rule resets this session and deals a fresh hand
-          using the matching indices. Illustrious 18 drills exclude surrender;
-          Fab 4 drills include late surrender.
+          Applying a dealer rule change resets this session and deals a fresh
+          hand using the matching indices. Illustrious 18 drills exclude
+          surrender; Fab 4 drills include late surrender.
         </div>
         <div className="settings-form">
           <DeviationRuleFields
-            rules={settings.rules}
+            rules={(draft || settings).rules}
             onChange={trainer.updateRule}
           />
         </div>
@@ -74,16 +79,17 @@ export function DeviationDialogs() {
       <Dialog
         title="Blackjack 98 — Deviation Options"
         className="settings-modal"
+        onCancel={trainer.closePanel}
       >
         <h2>GAME OPTIONS</h2>
         <div className="setting-hint">
-          Changing the practice set starts a new session. Menus pause the
+          Applying a practice set change starts a new session. Menus pause the
           decision clock and the next hand. Enable Skip explanations to move on
           automatically after mistakes instead of reviewing the correct move.
         </div>
         <div className="settings-form">
           <DeviationOptionFields
-            options={settings.options}
+            options={(draft || settings).options}
             onChange={trainer.updateOption}
           />
         </div>
@@ -105,7 +111,11 @@ export function DeviationDialogs() {
     );
   if (state.panel === 'help')
     return (
-      <Dialog title="Blackjack 98 — Deviation Help" className="settings-modal">
+      <Dialog
+        title="Blackjack 98 — Deviation Help"
+        className="settings-modal"
+        onCancel={trainer.closePanel}
+      >
         <h2>HOW TO PRACTICE</h2>
         <ul className="rules-list">
           <li>
@@ -164,12 +174,12 @@ export function DeviationDialogs() {
   return null;
 }
 function Close() {
-  const { trainer } = useDeviationTrainer();
+  const { trainer, settings, draft } = useDeviationTrainer();
   return (
-    <div className="modal-actions bottom-actions">
-      <ActionButton className="primary wide" onClick={trainer.closePanel}>
-        CLOSE
-      </ActionButton>
-    </div>
+    <SettingsActions
+      dirty={JSON.stringify(draft) !== JSON.stringify(settings)}
+      onApply={trainer.applySettings}
+      onClose={trainer.closePanel}
+    />
   );
 }

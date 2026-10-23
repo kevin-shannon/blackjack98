@@ -1,77 +1,47 @@
-import { useEffect, useState } from 'react';
 import { useBlackjack } from '../hooks/useBlackjack';
 import { CHIPS } from '../model/constants';
-import { money } from '../../../shared/lib/format';
+import { ActionButton } from '../../../shared/ui/ActionButton';
+import chip5 from '../../../assets/chips/5.png';
+import chip25 from '../../../assets/chips/25.png';
+import chip50 from '../../../assets/chips/50.png';
+import chip100 from '../../../assets/chips/100.png';
+import chip500 from '../../../assets/chips/500.png';
+
+const icons = { 5: chip5, 25: chip25, 50: chip50, 100: chip100, 500: chip500 };
+
 export function BetControls() {
-  const { game, state, selectedChip } = useBlackjack();
-  const [draftBet, setDraftBet] = useState(String(state.bet));
-  useEffect(() => setDraftBet(String(state.bet)), [state.bet]);
-  const disabled = !game.canBet() || state.bankroll < state.minBet;
-  function commit() {
-    game.setBet(draftBet);
-    setDraftBet(String(game.getSnapshot().state.bet));
-  }
+  const { game, state } = useBlackjack();
+  const locked = !game.canBet();
+  const limit = Math.min(state.maxBet, Math.floor(state.bankroll / 5) * 5);
   return (
-    <section className="bet-panel" aria-label="Bet controls">
-      <div className="panel-head">
-        <span className="panel-title">Your wager</span>
-        <span className="panel-helper">
-          {game.canBet() ? `${money(selectedChip)} increments` : 'Wager locked'}
-        </span>
-      </div>
-      <div className="bet-line">
-        <button
-          className="bet-step"
-          disabled={disabled || state.bet <= state.minBet}
-          aria-label={`Decrease wager by ${money(selectedChip)}`}
-          onClick={() => game.setBet(state.bet - selectedChip)}
-        >
-          −
-        </button>
-        <div className="bet-value-wrap">
-          <span className="money-prefix">$</span>
-          <input
-            className="bet-input"
-            type="number"
-            min={state.minBet}
-            max={Math.min(state.maxBet, state.bankroll)}
-            step={5}
-            inputMode="numeric"
-            aria-label="Bet amount"
-            value={draftBet}
-            disabled={disabled}
-            onChange={(event) => setDraftBet(event.target.value)}
-            onBlur={commit}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') event.currentTarget.blur();
-            }}
-          />
-        </div>
-        <button
-          className="bet-step"
-          disabled={
-            disabled || state.bet >= Math.min(state.maxBet, state.bankroll)
-          }
-          aria-label={`Increase wager by ${money(selectedChip)}`}
-          onClick={() => game.setBet(state.bet + selectedChip)}
-        >
-          +
-        </button>
-      </div>
-      <div className="chips">
+    <section className="felt-wagers" aria-label="Bet controls">
+      <div className="wager-chips">
         {CHIPS.map((chip) => (
           <button
             key={chip}
-            className={`chip${chip === selectedChip ? ' selected' : ''}`}
-            data-chip={chip}
-            aria-pressed={chip === selectedChip}
-            title={`Select $${chip} denomination`}
-            onClick={() => game.selectChip(chip)}
+            className="wager-chip"
+            aria-label={'Add $' + chip + ' to bet'}
+            title={'Add $' + chip + ' to bet'}
+            disabled={locked || state.bet >= limit}
+            onClick={() => game.addChip(chip)}
           >
-            ${chip}
+            <img
+              src={icons[chip]}
+              width={32}
+              height={32}
+              alt=""
+              draggable={false}
+            />
           </button>
         ))}
       </div>
+      <ActionButton
+        className="wager-clear"
+        disabled={locked || state.bet === 0}
+        onClick={() => game.setBet(0)}
+      >
+        Clear
+      </ActionButton>
     </section>
   );
 }

@@ -270,14 +270,6 @@ export function DecisionPractice<
               </ActionButton>
             ))}
           </div>
-          <div className="action-note">
-            Shortcuts:{' '}
-            {actions.map(({ action, key, label }) => (
-              <span key={action}>
-                <kbd>{key}</kbd> {label}
-              </span>
-            ))}
-          </div>
         </section>
       </GameWindow>
     </>

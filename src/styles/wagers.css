@@ -1,0 +1,95 @@
+.table-balances {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.table-bet {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-left: 4px;
+  color: #fff;
+  font-size: 10px;
+}
+.table-bet output {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.freeplay-controls {
+  grid-template-columns: minmax(0, 1fr);
+}
+.freeplay-controls .action-panel {
+  min-height: auto;
+}
+.freeplay-controls .action-buttons {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+.felt-wagers {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.freeplay-felt::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 320px;
+  height: 320px;
+  right: -120px;
+  bottom: -70px;
+  border-radius: 50%;
+  background: #159345;
+  pointer-events: none;
+}
+.wager-chips {
+  display: grid;
+  grid-template-columns: repeat(2, 56px);
+  gap: 4px;
+}
+.wager-chip {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  touch-action: manipulation;
+}
+.wager-chip:first-child {
+  grid-column: 2;
+}
+.wager-chip img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  border-radius: 50%;
+}
+.wager-chip:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -2px;
+}
+.wager-chip:active:not(:disabled) img {
+  transform: translate(1px, 1px);
+}
+.wager-chip:disabled {
+  opacity: 0.55;
+}
+.felt-wagers .wager-clear {
+  height: 28px;
+}
+@media (pointer: coarse), (max-width: 760px) {
+  .freeplay-controls .action-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .felt-wagers .wager-clear {
+    height: 44px;
+  }
+}

@@ -117,15 +117,19 @@ it('pauses timers on menus and mode switches and resets only this session on rul
   await vi.advanceTimersByTimeAsync(FEEDBACK_MS);
   trainer.openPanel('rules');
   trainer.updateRule('hitSoft17', true);
+  trainer.applySettings();
   expect(state().stats).toEqual(createPracticeStats('deviations'));
   expect(state().feedback).toBeNull();
   trainer.closePanel();
   trainer.answer('hit');
   trainer.openPanel('options');
   trainer.updateOption('set', 'fab-4');
+  trainer.applySettings();
   expect(state().stats.attempts).toBe(0);
   trainer.updateOption('timedHands', true);
+  trainer.applySettings();
   trainer.updateOption('seconds', 3);
+  trainer.applySettings();
   trainer.closePanel();
   await vi.advanceTimersByTimeAsync(3000);
   expect(state().stats).toMatchObject({

@@ -39,6 +39,56 @@ async function finish(task: Promise<void>) {
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 describe('card values', () => {
+  it('stages rules until Apply and preserves the current round on Cancel', async () => {
+    const { game, state, save } = scenario(['10', '6', '7', '10']);
+    await finish(game.deal());
+    const before = game.getSnapshot();
+    save.mockClear();
+    game.openPanel('rules');
+    game.updateRule('decks', 2);
+    expect(game.getSnapshot().rules).toEqual(before.rules);
+    expect(game.getSnapshot().draftRules!.decks).toBe(2);
+    expect(state().hands).toEqual(before.state.hands);
+    expect(state().bankroll).toBe(before.state.bankroll);
+    expect(save).not.toHaveBeenCalled();
+    game.closePanel();
+    expect(game.getSnapshot().draftRules).toBeNull();
+    expect(state().hands).toEqual(before.state.hands);
+    game.openPanel('rules');
+    game.updateRule('decks', 2);
+    game.updateRule('hitSoft17', !before.rules.hitSoft17);
+    game.applySettings();
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(game.getSnapshot().rules.decks).toBe(2);
+    expect(state().panel).toBe('rules');
+    expect(state().phase).toBe('betting');
+    expect(state().bankroll).toBe(before.state.roundStartBankroll);
+    game.updateRule('decks', 8);
+    game.closePanel();
+    expect(game.getSnapshot().rules.decks).toBe(2);
+    expect(save).toHaveBeenCalledTimes(1);
+  });
+  it('stages stakes and timer options and cancels only unapplied edits', () => {
+    const { game, save } = scenario([]);
+    const before = game.getSnapshot().options;
+    save.mockClear();
+    game.openPanel('options');
+    game.updateOption('stakes', 'high-roller');
+    game.updateOption('timedHands', true);
+    expect(game.getSnapshot().options).toEqual(before);
+    expect(save).not.toHaveBeenCalled();
+    game.closePanel();
+    expect(game.getSnapshot().options).toEqual(before);
+    game.openPanel('options');
+    game.updateOption('stakes', 'high-roller');
+    game.applySettings();
+    expect(game.getSnapshot().options.stakes).toBe('high-roller');
+    expect(game.getSnapshot().state.panel).toBe('options');
+    game.updateOption('stakes', 'small-fry');
+    game.closePanel();
+    expect(game.getSnapshot().options.stakes).toBe('high-roller');
+    expect(save).toHaveBeenCalledTimes(1);
+  });
   it('reduces multiple aces without losing a soft total', () => {
     expect(score([{ rank: 'A' }, { rank: 'A' }, { rank: '9' }])).toEqual({
       total: 21,
@@ -220,6 +270,7 @@ describe('splitting and cancellation', () => {
     expect(state().bankroll).toBe(925);
     game.openPanel('rules');
     game.updateRule('decks', 2);
+    game.applySettings();
     expect(state()).toMatchObject({
       bankroll: 1000,
       phase: 'betting',
@@ -262,12 +313,13 @@ describe('training options and settings', () => {
       const { game, state } = scenario([]);
       game.openPanel('options');
       game.updateOption('stakes', stakes);
+      game.applySettings();
       expect(state().bankroll).toBe(1000);
       expect(state().maxBet).toBe(500);
       game.resetSession();
       expect(state()).toMatchObject({ bankroll, minBet, maxBet });
       game.setBet(0);
-      expect(state().bet).toBe(minBet);
+      expect(state().bet).toBe(0);
       game.setBet(100000);
       expect(state().bet).toBe(Math.min(bankroll, maxBet));
     },
@@ -276,8 +328,11 @@ describe('training options and settings', () => {
     const { game, state } = scenario([]);
     game.openPanel('options');
     game.updateOption('maxBet', 100);
+    game.applySettings();
     game.updateOption('startingBankroll', 100);
+    game.applySettings();
     game.updateOption('minBet', 1000);
+    game.applySettings();
     expect(game.getSnapshot().options).toMatchObject({
       stakes: 'custom',
       minBet: 1000,
@@ -285,8 +340,10 @@ describe('training options and settings', () => {
       startingBankroll: 1000,
     });
     game.updateOption('startingBankroll', 750);
+    game.applySettings();
     expect(game.getSnapshot().options.minBet).toBe(500);
     game.updateOption('maxBet', 100);
+    game.applySettings();
     expect(game.getSnapshot().options.minBet).toBe(100);
     game.resetSession();
     expect(state()).toMatchObject({ bankroll: 750, minBet: 100, maxBet: 100 });
@@ -345,16 +402,60 @@ describe('training options and settings', () => {
     expect(game.getSnapshot().rules.decks).toBe(6);
     expect(save).not.toHaveBeenCalled();
   });
-  it('selects a denomination separately from changing the wager', () => {
+  it('adds each chip directly to the wager and clears to zero', () => {
     const { game, state } = scenario([]);
-    game.selectChip(100);
-    expect(state().bet).toBe(25);
-    game.setBet(state().bet + game.getSnapshot().selectedChip);
+    game.addChip(100);
     expect(state().bet).toBe(125);
+    game.addChip(25);
+    expect(state().bet).toBe(150);
     game.setBet(9999);
     expect(state().bet).toBe(500);
     game.setBet(0);
+    expect(state().bet).toBe(0);
+    game.addChip(10); // Only the displayed denominations are accepted.
+    expect(state().bet).toBe(0);
+  });
+  it('builds a wager below the minimum without dealing or silently increasing it', async () => {
+    const { game, state } = scenario(
+      ['10', '6', '7', '10'],
+      {},
+      { minBet: 25 },
+    );
+    game.setBet(0);
+    await game.deal();
+    expect(state().hands).toHaveLength(0);
+    expect(state().bankroll).toBe(1000);
+    game.addChip(5);
     expect(state().bet).toBe(5);
+    await game.deal();
+    expect(state().hands).toHaveLength(0);
+    game.addChip(25);
+    expect(state().bet).toBe(30);
+    const task = game.deal();
+    game.addChip(500);
+    game.setBet(0);
+    expect(state().bet).toBe(30);
+    await finish(task);
+    expect(state().hands[0].bet).toBe(30);
+    game.addChip(100);
+    expect(state().bet).toBe(30);
+    await finish(game.act('stand'));
+    game.addChip(100);
+    expect(state().bet).toBe(130);
+  });
+  it('caps added chips at available funds and table limits and locks edits in menus', () => {
+    const { game, state } = scenario(
+      [],
+      {},
+      { startingBankroll: 100, maxBet: 500 },
+    );
+    game.setBet(0);
+    game.addChip(500);
+    expect(state().bet).toBe(100);
+    game.openPanel('options');
+    game.setBet(0);
+    game.addChip(5);
+    expect(state().bet).toBe(100);
   });
   it('publishes stable immutable snapshots to subscribers', () => {
     const { game } = scenario([]);

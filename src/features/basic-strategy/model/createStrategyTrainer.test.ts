@@ -68,8 +68,11 @@ describe('rapid-fire practice lifecycle', () => {
         for (const surrender of [false, true]) {
           trainer.openPanel('rules');
           trainer.updateRule('hitSoft17', hitSoft17);
+          trainer.applySettings();
           trainer.updateRule('doubleAfterSplit', doubleAfterSplit);
+          trainer.applySettings();
           trainer.updateRule('surrender', surrender);
+          trainer.applySettings();
           trainer.closePanel();
           attempts = 0;
           expect(trainer.getSnapshot().state.stats.attempts).toBe(attempts);
@@ -101,6 +104,7 @@ describe('rapid-fire practice lifecycle', () => {
         }
     trainer.openPanel('options');
     trainer.updateOption('difficulty', 'normal');
+    trainer.applySettings();
     trainer.closePanel();
     expect(trainer.getSnapshot().state.stats.attempts).toBe(attempts);
     expect(
@@ -197,6 +201,7 @@ describe('rapid-fire practice lifecycle', () => {
     await vi.advanceTimersByTimeAsync(FEEDBACK_MS);
     trainer.openPanel('rules');
     trainer.updateRule('surrender', true);
+    trainer.applySettings();
     trainer.closePanel();
     expect(state().stats.attempts).toBe(0);
     trainer.answer('surrender');
@@ -228,6 +233,7 @@ describe('rapid-fire practice lifecycle', () => {
           trainer.openPanel('rules');
           const newValue = !trainer.getSnapshot().settings.rules[rule];
           trainer.updateRule(rule, newValue);
+          trainer.applySettings();
           expect(state().stats).toEqual(createBasicStrategyStats());
           expect(state()).toMatchObject({
             phase: 'answering',
@@ -259,6 +265,7 @@ describe('rapid-fire practice lifecycle', () => {
     const before = state();
     trainer.openPanel('rules');
     trainer.updateRule('hitSoft17', false);
+    trainer.applySettings();
     trainer.closePanel();
     expect(state().stats).toEqual(before.stats);
     expect(state().question).toEqual(before.question);

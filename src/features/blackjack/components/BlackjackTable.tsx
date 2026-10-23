@@ -6,7 +6,7 @@ import { PlayingCard } from './PlayingCard';
 import { PlayerHand } from './PlayerHand';
 import { ShoeMeter } from './ShoeMeter';
 import { CountPeek } from './CountPeek';
-import { RoundCounter } from '../../../shared/ui/RoundCounter';
+import { BetControls } from './BetControls';
 export function BlackjackTable() {
   const { state, rules, shoeRemaining, shoeTotal, timerSeconds } =
     useBlackjack();
@@ -25,11 +25,17 @@ export function BlackjackTable() {
       : '';
   return (
     <section className="table-shell" aria-label="Blackjack table">
-      <div className="felt">
+      <div className="felt freeplay-felt">
         <div className="table-topline">
-          <div className="bank" aria-label="Current bankroll">
-            <div className="banklabel">BANKROLL</div>
-            <div className="bankvalue">{money(state.bankroll)}</div>
+          <div className="table-balances">
+            <div className="bank" aria-label="Current bankroll">
+              <div className="banklabel">BANKROLL</div>
+              <div className="bankvalue">{money(state.bankroll)}</div>
+            </div>
+            <div className="table-bet">
+              <span>BET</span>
+              <output aria-label="Bet amount">{money(state.bet)}</output>
+            </div>
           </div>
           <div className="table-tools">
             <div className="shoe-group">
@@ -116,8 +122,8 @@ export function BlackjackTable() {
             <span style={{ padding: '0 7px' }}>•</span>
             {` MAX ${money(state.maxBet)}`}
           </span>
-          <RoundCounter round={state.round} />
         </div>
+        <BetControls />
       </div>
     </section>
   );

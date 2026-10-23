@@ -21,7 +21,6 @@ export function useGameKeyboard() {
       )
         return;
       const { state } = game.getSnapshot();
-      if (state.phase === 'insurance') return;
       if (state.panel) {
         if (event.key === 'Escape') {
           event.preventDefault();

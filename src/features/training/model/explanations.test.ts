@@ -51,7 +51,14 @@ describe.each(['basic-strategy', 'deviations'] as const)(
         key: K,
         value: TimedPracticeOptions[K],
       ) => void;
-      const trainer = { ...store, updateOption };
+      const trainer = {
+        ...store,
+        updateOption,
+        updateRule: store.updateRule as (
+          key: 'hitSoft17',
+          value: boolean,
+        ) => void,
+      };
       trainer.configure();
       trainer.updateOption('skipExplanations', skipExplanations);
       trainer.updateOption('timedHands', true);
@@ -65,6 +72,61 @@ describe.each(['basic-strategy', 'deviations'] as const)(
         state: () => trainer.getSnapshot().state,
       };
     }
+    it('stages rules, cancels without resetting, and applies a batch only once', () => {
+      const { trainer, state, save, disconnect } = practice();
+      trainer.answer('stand');
+      const before = trainer.getSnapshot();
+      save.mockClear();
+      trainer.openPanel('rules');
+      trainer.updateRule('hitSoft17', true);
+      expect(trainer.getSnapshot().draft!.rules.hitSoft17).toBe(true);
+      expect(trainer.getSnapshot().settings).toEqual(before.settings);
+      expect(state().stats).toEqual(before.state.stats);
+      expect(state().question).toEqual(before.state.question);
+      expect(save).not.toHaveBeenCalled();
+      trainer.closePanel();
+      expect(trainer.getSnapshot().draft).toBeNull();
+      expect(trainer.getSnapshot().settings).toEqual(before.settings);
+      expect(state().feedback).toEqual(before.state.feedback);
+      trainer.openPanel('rules');
+      trainer.updateRule('hitSoft17', true);
+      trainer.updateRule('hitSoft17', false);
+      trainer.updateRule('hitSoft17', true);
+      trainer.applySettings();
+      expect(save).toHaveBeenCalledTimes(1);
+      expect(state().panel).toBe('rules');
+      expect(state().stats.attempts).toBe(0);
+      expect(state().question!.id).toBe(before.state.question!.id + 1);
+      expect(trainer.getSnapshot().settings.rules.hitSoft17).toBe(true);
+      expect(trainer.getSnapshot().draft).toEqual(
+        trainer.getSnapshot().settings,
+      );
+      trainer.updateRule('hitSoft17', false);
+      trainer.closePanel();
+      expect(trainer.getSnapshot().settings.rules.hitSoft17).toBe(true);
+      expect(save).toHaveBeenCalledTimes(1);
+      disconnect();
+    });
+    it('keeps options pending and cancels edits made after Apply', () => {
+      const { trainer, save, disconnect } = practice();
+      save.mockClear();
+      trainer.openPanel('options');
+      trainer.updateOption('seconds', 5);
+      trainer.updateOption('skipExplanations', true);
+      expect(trainer.getSnapshot().settings.options.seconds).toBe(3);
+      expect(save).not.toHaveBeenCalled();
+      trainer.applySettings();
+      expect(trainer.getSnapshot().state.panel).toBe('options');
+      expect(trainer.getSnapshot().settings.options).toMatchObject({
+        seconds: 5,
+        skipExplanations: true,
+      });
+      expect(save).toHaveBeenCalledTimes(1);
+      trainer.updateOption('seconds', 8);
+      trainer.closePanel();
+      expect(trainer.getSnapshot().settings.options.seconds).toBe(5);
+      disconnect();
+    });
     it('discards a run and its pending timers without losing saved options', async () => {
       const { trainer, state, disconnect } = practice();
       const savedSettings = trainer.getSnapshot().settings;
@@ -152,6 +214,7 @@ describe.each(['basic-strategy', 'deviations'] as const)(
       expect(state().question!.id).toBe(2);
       trainer.openPanel('options');
       trainer.updateOption('skipExplanations', false);
+      trainer.applySettings();
       trainer.closePanel();
       trainer.answer('hit');
       trainer.nextHand(); // Cannot bypass correct-answer feedback.
@@ -171,6 +234,7 @@ describe.each(['basic-strategy', 'deviations'] as const)(
       trainer.answer('stand');
       trainer.openPanel('options');
       trainer.updateOption('seconds', 4);
+      trainer.applySettings();
       trainer.nextHand();
       await vi.advanceTimersByTimeAsync(10000);
       trainer.closePanel();
@@ -181,6 +245,7 @@ describe.each(['basic-strategy', 'deviations'] as const)(
       expect(state()).toMatchObject({ phase: 'review', question: { id: 1 } });
       trainer.openPanel('options');
       trainer.updateOption('skipExplanations', true);
+      trainer.applySettings();
       expect(save.mock.lastCall![0].options.skipExplanations).toBe(true);
       await vi.advanceTimersByTimeAsync(10000); // Options still pause automatic feedback.
       expect(state().question!.id).toBe(1);
@@ -191,6 +256,7 @@ describe.each(['basic-strategy', 'deviations'] as const)(
       await vi.advanceTimersByTimeAsync(400);
       trainer.openPanel('options');
       trainer.updateOption('skipExplanations', false);
+      trainer.applySettings();
       trainer.closePanel();
       await vi.advanceTimersByTimeAsync(10000);
       expect(state()).toMatchObject({ phase: 'review', question: { id: 2 } });
@@ -202,6 +268,7 @@ describe.each(['basic-strategy', 'deviations'] as const)(
       await vi.advanceTimersByTimeAsync(1000);
       trainer.openPanel('options');
       trainer.updateOption('skipExplanations', true);
+      trainer.applySettings();
       trainer.closePanel();
       expect(trainer.getSnapshot().timerSeconds).toBe(2);
       await vi.advanceTimersByTimeAsync(2000);

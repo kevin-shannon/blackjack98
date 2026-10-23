@@ -99,15 +99,17 @@ tests/browser/
 ## Behavior preserved
 
 - Configurable decks, penetration, blackjack payouts, soft 17, double after split, resplit aces, and late surrender.
-- Insurance, up to four split hands, virtual bankroll, and per-session win/loss/push totals.
+- Insurance, up to four split hands, virtual bankroll, and per-session win/loss/push totals. When the dealer shows an Ace, Insurance and Decline replace the normal action buttons; the table status shows the side-bet cost. There is no insurance popup.
 - Split aces remain playable after their second cards, matching v14. A split 21 is a regular win.
 - Timed decisions pause for menus. The Hi-Lo running count tracks exposed cards and resets after a shuffle. Hold the table's Peek count button (mouse, touch, Space, or Enter) to reveal it; releasing hides it. Automatic count quizzes are reserved for a future training mode, and their old saved preferences are ignored.
 - Setup changes are drafts until Start. Live rule changes void an unfinished round and refund all its stakes.
-- Chip selection sets the increment; the plus/minus buttons change the wager. Keyboard shortcuts and card animations remain available.
+- Free Play wagers use the supplied chip icons displayed at 48px in the lower-right felt corner. The controls overlay the felt without reserving height or horizontal space; hands retain their original centered layout. Clicking adds that denomination; Clear resets the bet to zero. The wager appears beneath the bankroll. Bets can be built below the table minimum, but Deal stays disabled until the minimum is reached. Adds are capped at the table maximum and available bankroll. Wager controls remain visible and lock during rounds. The Free Play round counter is replaced by these controls; rounds are still tracked internally. Keyboard shortcuts and card animations remain available.
 
 Game Options now has a Stakes selector: Small Fry ($500 bankroll, $5–$250 bets), Average Joe ($2,500, $25–$1,000), High Roller ($10,000, $100–$5,000), and Custom. The three sliders show preset amounts and unlock in Custom, using discrete value lists. Conflicting custom values adjust to keep the minimum affordable and no higher than the maximum. Stakes apply to the next new session. Existing preferences migrate to Custom with their original limits.
 
 Dialogs now retain React-controlled fields while sliders move, keep keyboard focus inside, and make the underlying table inert. Event listeners, observers, and timers have explicit cleanup. In-flight rounds use cancellation tokens so a reset cannot resume stale dealing animations.
+
+Rules and Options dialogs keep edits pending until OK or Apply. OK saves and closes; Apply saves and stays open; Cancel (or Escape) discards edits since the last Apply. Apply is disabled when nothing has changed. Applying rule changes retains each mode's existing session-reset behavior.
 
 ## Basic Strategy
 
