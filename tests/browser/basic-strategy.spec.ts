@@ -195,6 +195,9 @@ test('keeps one resume button and starts fresh when switching between Free Play 
     .getByLabel('Current bankroll')
     .locator('.bankvalue')
     .innerText();
+  await page
+    .getByRole('button', { name: 'Add $25 to bet', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Deal cards' }).click();
   await expect(
     page.getByRole('button', { name: 'Stand', exact: true }),

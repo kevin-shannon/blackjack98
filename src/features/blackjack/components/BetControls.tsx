@@ -11,6 +11,7 @@ const icons = { 5: chip5, 25: chip25, 50: chip50, 100: chip100, 500: chip500 };
 
 export function BetControls() {
   const { game, state } = useBlackjack();
+  if (state.phase !== 'betting' && state.phase !== 'roundOver') return null;
   const locked = !game.canBet();
   const limit = Math.min(state.maxBet, Math.floor(state.bankroll / 5) * 5);
   return (

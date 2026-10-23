@@ -96,7 +96,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     minBet: options.minBet,
     maxBet: options.maxBet,
     bankroll: options.startingBankroll,
-    bet: 25,
+    bet: 0,
     phase: 'betting',
     busy: false,
     modeStarted: false,
@@ -549,7 +549,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     state.bankroll = options.startingBankroll;
     state.minBet = options.minBet;
     state.maxBet = options.maxBet;
-    state.bet = normalizeBet(Math.max(25, state.minBet));
+    state.bet = 0;
     state.phase = 'betting';
     state.busy = false;
     state.dealer = [];

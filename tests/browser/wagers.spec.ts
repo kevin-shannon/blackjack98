@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-for (const width of [1280, 375, 320]) {
-  test(`felt chips add wagers and lock during play at ${width}px`, async ({
+for (const width of [1280, 640, 375, 320]) {
+  test(`felt chips add wagers and hide during play at ${width}px`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize({ width, height: 900 });
@@ -22,7 +22,6 @@ for (const width of [1280, 375, 320]) {
       });
     await expect(page.locator('.bet-panel')).toHaveCount(0);
     await expect(page.getByLabel('Current round')).toHaveCount(0);
-    await clear.click();
     await expect(bet).toHaveText('$0');
     await expect(clear).toBeDisabled();
     await chip(5).click();
@@ -37,7 +36,12 @@ for (const width of [1280, 375, 320]) {
         const image = chip(value).locator('img');
         await expect(image).toHaveJSProperty('naturalWidth', 32);
         await expect(image).toHaveJSProperty('naturalHeight', 32);
-        await expect(image).toHaveCSS('width', '48px');
+        const size = width <= 460 ? 38 : width <= 760 ? 44 : 48;
+        await expect(image).toHaveCSS('width', `${size}px`);
+        await expect(image).toHaveCSS('height', `${size}px`);
+        expect((await chip(value).boundingBox())!.width).toBeGreaterThanOrEqual(
+          44,
+        );
         return (await chip(value).boundingBox())!;
       }),
     );
@@ -76,8 +80,10 @@ for (const width of [1280, 375, 320]) {
       fullPage: true,
     });
     await page.getByRole('button', { name: 'Deal cards' }).click();
-    for (const button of await controls.getByRole('button').all())
-      await expect(button).toBeDisabled();
+    await expect(controls).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Clear', exact: true }),
+    ).toHaveCount(0);
     await expect(
       page.getByRole('button', { name: 'Stand', exact: true }),
     ).toBeEnabled();
@@ -108,6 +114,7 @@ for (const width of [1280, 375, 320]) {
       page.getByRole('button', { name: 'Deal again' }),
     ).toBeEnabled();
     await expect(chip(100)).toBeEnabled();
+    await expect(controls).toBeVisible();
     await chip(100).focus();
     await page.keyboard.press('Enter');
     await expect(bet).toHaveText('$130');

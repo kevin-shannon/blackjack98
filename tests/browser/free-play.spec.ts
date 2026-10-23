@@ -27,6 +27,9 @@ test('split hand slots and labels stay aligned with different card counts', asyn
     (Math.random as typeof Math.random & { reset: () => void }).reset(),
   );
   await page.getByRole('button', { name: 'START FREE PLAY' }).click();
+  await page
+    .getByRole('button', { name: 'Add $25 to bet', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Deal cards' }).click();
   await expect(
     page.getByRole('button', { name: 'Split', exact: true }),
@@ -82,6 +85,9 @@ test('reveals the running count only while held, including keyboard and lost foc
   const peek = page.getByRole('button', { name: 'Peek count', exact: true });
   const count = page.getByLabel('Running count', { exact: true });
   await expect(count).toHaveText('—');
+  await page
+    .getByRole('button', { name: 'Add $25 to bet', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Deal cards' }).click();
   await expect(
     page.getByRole('button', { name: 'Stand', exact: true }),
@@ -190,7 +196,7 @@ test('starts, adjusts wagers, completes rounds, and resets without browser error
   await page
     .getByRole('button', { name: 'Add $100 to bet', exact: true })
     .click();
-  await expect(page.getByLabel('Bet amount')).toHaveText('$125');
+  await expect(page.getByLabel('Bet amount')).toHaveText('$100');
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
   await expect(page.getByLabel('Bet amount')).toHaveText('$0');
   await expect(page.getByRole('button', { name: 'Deal cards' })).toBeDisabled();
@@ -214,6 +220,8 @@ test('starts, adjusts wagers, completes rounds, and resets without browser error
   await expect(page.locator('.status')).toHaveText(
     'Choose your wager to begin.',
   );
+  await expect(page.getByLabel('Bet amount')).toHaveText('$0');
+  await expect(page.getByRole('button', { name: 'Deal cards' })).toBeDisabled();
   expect(errors).toEqual([]);
 });
 test('keeps setup controls mounted, discards drafts on Back, and persists committed settings', async ({
@@ -320,6 +328,9 @@ test('captures legacy and React screens for visual review when the original HTML
       await capture('setup');
       await page.getByRole('button', { name: 'START FREE PLAY' }).click();
       await capture('table');
+      await page
+        .getByRole('button', { name: 'Add $25 to bet', exact: true })
+        .click();
       await page.getByRole('button', { name: 'Deal cards' }).click();
       await expect(
         page.getByRole('button', { name: 'Stand', exact: true }),
@@ -364,7 +375,7 @@ test('selects stakes presets, locks their sliders, and applies limits to the nex
   await page.getByRole('button', { name: 'New Session', exact: true }).click();
   await page.getByRole('button', { name: 'RESET', exact: true }).click();
   await expect(page.getByLabel('Current bankroll')).toContainText('$10,000');
-  await expect(page.getByLabel('Bet amount')).toHaveText('$100');
+  await expect(page.getByLabel('Bet amount')).toHaveText('$0');
   for (let i = 0; i < 10; i++)
     await page.getByRole('button', { name: 'Add $500 to bet' }).click();
   await expect(page.getByLabel('Bet amount')).toHaveText('$5,000');
@@ -425,7 +436,7 @@ test('custom stakes use discrete values, persist, and fit three sliders side by 
   });
   await page.getByRole('button', { name: 'START FREE PLAY' }).click();
   await expect(page.getByLabel('Current bankroll')).toContainText('$750');
-  await expect(page.getByLabel('Bet amount')).toHaveText('$75');
+  await expect(page.getByLabel('Bet amount')).toHaveText('$0');
   await page.reload();
   await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(

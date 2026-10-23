@@ -30,6 +30,8 @@ function scenario(
   });
   game.configureFreePlay();
   game.startFreePlay();
+  // Round scenarios explicitly place the wager they exercise.
+  game.setBet(Math.max(25, game.getSnapshot().state.minBet));
   return { game, save, completed, state: () => game.getSnapshot().state };
 }
 async function finish(task: Promise<void>) {
@@ -39,6 +41,22 @@ async function finish(task: Promise<void>) {
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 describe('card values', () => {
+  it('starts and resets sessions with no wager, requiring chips before dealing', async () => {
+    const { game, state } = scenario(['10', '6', '7', '10']);
+    game.resetSession();
+    expect(state().bet).toBe(0);
+    await game.deal();
+    expect(state().hands).toHaveLength(0);
+    expect(state().bankroll).toBe(1000);
+    game.addChip(25);
+    await finish(game.deal());
+    expect(state().hands[0].bet).toBe(25);
+    game.resetSession();
+    expect(state().bet).toBe(0);
+    game.configureFreePlay();
+    game.startFreePlay();
+    expect(state().bet).toBe(0);
+  });
   it('stages rules until Apply and preserves the current round on Cancel', async () => {
     const { game, state, save } = scenario(['10', '6', '7', '10']);
     await finish(game.deal());

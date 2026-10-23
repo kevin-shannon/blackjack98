@@ -26,6 +26,9 @@ for (const choice of ['Insurance', 'Decline'] as const) {
       (Math.random as typeof Math.random & { reset(): void }).reset(),
     );
     await page.getByRole('button', { name: 'START FREE PLAY' }).click();
+    await page
+      .getByRole('button', { name: 'Add $25 to bet', exact: true })
+      .click();
     await page.getByRole('button', { name: 'Deal cards' }).click();
     const actions = page.getByRole('region', { name: 'Game actions' });
     const insurance = actions.getByRole('button', {
@@ -40,8 +43,9 @@ for (const choice of ['Insurance', 'Decline'] as const) {
       page.getByRole('button', { name: 'Hit', exact: true }),
     ).toHaveCount(0);
     await expect(page.locator('.status')).toContainText('$12.50');
-    for (const button of await page.locator('.felt-wagers button').all())
-      await expect(button).toBeDisabled();
+    await expect(
+      page.getByRole('region', { name: 'Bet controls' }),
+    ).toHaveCount(0);
     await page.getByRole('button', { name: 'Help', exact: true }).click();
     await page
       .getByRole('dialog')
@@ -97,7 +101,6 @@ test('insurance is disabled when its side bet is unaffordable, while Decline sti
     (Math.random as typeof Math.random & { reset(): void }).reset(),
   );
   await page.getByRole('button', { name: 'START FREE PLAY' }).click();
-  await page.getByRole('button', { name: 'Clear', exact: true }).click();
   await page
     .getByRole('button', { name: 'Add $100 to bet', exact: true })
     .click();
