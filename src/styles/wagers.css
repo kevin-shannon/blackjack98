@@ -37,18 +37,6 @@
   flex-direction: column;
   gap: 8px;
 }
-.freeplay-felt:has(.felt-wagers)::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  width: 320px;
-  height: 320px;
-  right: -120px;
-  bottom: -70px;
-  border-radius: 50%;
-  background: #159345;
-  pointer-events: none;
-}
 .wager-chips {
   display: grid;
   grid-template-columns: repeat(2, var(--chip-button-size));
