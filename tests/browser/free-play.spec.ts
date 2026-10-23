@@ -22,9 +22,7 @@ test('split hand slots and labels stay aligned with different card counts', asyn
     });
   });
   await page.goto('/');
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await page.evaluate(() =>
     (Math.random as typeof Math.random & { reset: () => void }).reset(),
   );
@@ -158,9 +156,7 @@ test('count peek supports a touch hold and hides on release or cancellation', as
 });
 async function start(page: Page) {
   await page.goto('/');
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await page.getByRole('button', { name: 'START FREE PLAY' }).click();
 }
 async function finishRound(page: Page) {
@@ -218,9 +214,7 @@ test('keeps setup controls mounted, discards drafts on Back, and persists commit
   page,
 }) => {
   await page.goto('/');
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   const decks = page.getByLabel('Number of decks');
   await decks.focus();
   await decks.press('Home');
@@ -228,9 +222,7 @@ test('keeps setup controls mounted, discards drafts on Back, and persists commit
   await expect(decks).toHaveValue('2');
   await expect(decks).toBeFocused();
   await page.getByRole('button', { name: 'BACK' }).click();
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(decks).toHaveValue('6');
   await decks.focus();
   await decks.press('Home');
@@ -238,9 +230,7 @@ test('keeps setup controls mounted, discards drafts on Back, and persists commit
   await expect(page.getByLabel('Seconds per action')).toBeEnabled();
   await page.getByRole('button', { name: 'START FREE PLAY' }).click();
   await page.reload();
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(decks).toHaveValue('1');
   await expect(
     page.getByRole('checkbox', { name: 'Timed hands' }),
@@ -277,9 +267,7 @@ test('fits narrow screens and scrolls setup while keeping start accessible', asy
   await expect(page.getByRole('dialog')).toBeInViewport();
   await page.getByRole('button', { name: 'CLOSE', exact: true }).click();
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(
     page.getByRole('button', { name: 'START FREE PLAY' }),
   ).toBeInViewport();
@@ -317,11 +305,11 @@ test('captures legacy and React screens for visual review when the original HTML
           animations: 'disabled',
         });
       };
-      await page.getByRole('heading', { name: 'MAIN MENU' }).click();
-      await capture('menu');
       await page
-        .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
+        .getByRole('heading', { name: 'Welcome to Blackjack 98!' })
         .click();
+      await capture('menu');
+      await page.getByRole('button', { name: /^FREE PLAY / }).click();
       await page.getByRole('heading', { name: 'SET UP YOUR TABLE' }).click();
       await capture('setup');
       await page.getByRole('button', { name: 'START FREE PLAY' }).click();
@@ -376,9 +364,7 @@ test('selects stakes presets, locks their sliders, and applies limits to the nex
   await expect(page.getByLabel('Bet amount')).toHaveValue('5000');
   await expect(page.locator('.table-bottomline')).toContainText('MIN $100');
   await page.reload();
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(
     page.getByRole('radio', { name: 'High Roller', exact: true }),
   ).toBeChecked();
@@ -389,9 +375,7 @@ test('custom stakes use discrete values, persist, and fit three sliders side by 
 }, testInfo) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto('/');
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await page.getByRole('radio', { name: 'Average Joe', exact: true }).check();
   await page
     .getByRole('radio', { name: 'Average Joe', exact: true })
@@ -434,9 +418,7 @@ test('custom stakes use discrete values, persist, and fit three sliders side by 
   await expect(page.getByLabel('Current bankroll')).toContainText('$750');
   await expect(page.getByLabel('Bet amount')).toHaveValue('75');
   await page.reload();
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(
     page.getByRole('radio', { name: 'Custom', exact: true }),
   ).toBeChecked();

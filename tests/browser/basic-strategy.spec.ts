@@ -3,9 +3,7 @@ import type { Page } from '@playwright/test';
 
 async function configure(page: Page) {
   await page.goto('/');
-  await page
-    .getByRole('button', { name: 'BASIC STRATEGY Rapid-fire decisions' })
-    .click();
+  await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
 }
 async function startStrategy(page: Page) {
   await configure(page);
@@ -30,16 +28,25 @@ test('gives instant feedback, updates accuracy, and deals another independent ha
   await expect(page.getByRole('button', { name: 'Peek count' })).toHaveCount(0);
   const split = page.getByRole('button', { name: 'Split', exact: true });
   await split.click();
-  await expect(page.getByRole('status')).toHaveText('Correct! Split.');
+  await expect(
+    page.getByRole('button', { name: 'Split', exact: true }),
+  ).toHaveClass(/strategy-correct-action/);
   await expect(page.getByLabel('Basic Strategy accuracy')).toContainText(
     '100.0%',
   );
-  await expect(page.locator('.playing-card')).toHaveCount(3);
+  await expect(page.locator('.playing-card')).toHaveCount(4);
+  await expect(page.getByLabel('Face-down card', { exact: true })).toHaveCount(
+    1,
+  );
+  await expect(page.locator('.dealer-area .seat-label')).toHaveText('Dealer 6');
+  await expect(page.locator('.strategy-hand .hand-under')).toHaveCount(0);
   await expect(split).toBeEnabled();
   await page.getByRole('button', { name: 'Stand', exact: true }).click();
-  await expect(page.getByRole('status')).toHaveText(
-    'Incorrect. Correct action: Split.',
-  );
+  await expect(
+    page
+      .getByRole('region', { name: 'Explanation', exact: true })
+      .getByRole('heading', { name: 'Split', exact: true }),
+  ).toBeVisible();
   await expect(page.getByLabel('Basic Strategy accuracy')).toContainText(
     '50.0%',
   );
@@ -58,7 +65,7 @@ test('offers only relevant settings and persists them independently of Free Play
   page,
 }) => {
   await configure(page);
-  await expect(page.getByRole('checkbox')).toHaveCount(4);
+  await expect(page.getByRole('checkbox')).toHaveCount(5);
   await expect(page.getByLabel('Number of decks')).toHaveCount(0);
   await expect(page.getByLabel('Stakes', { exact: true })).toHaveCount(0);
   await expect(page.getByLabel('Blackjack payout')).toHaveCount(0);
@@ -74,9 +81,7 @@ test('offers only relevant settings and persists them independently of Free Play
     page.getByRole('button', { name: 'Surrender', exact: true }),
   ).toBeVisible();
   await page.reload();
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(
     page.getByRole('checkbox', { name: 'Dealer hits soft 17' }),
   ).not.toBeChecked();
@@ -84,9 +89,7 @@ test('offers only relevant settings and persists them independently of Free Play
     page.getByRole('checkbox', { name: 'Allow surrender' }),
   ).not.toBeChecked();
   await page.getByRole('button', { name: 'BACK' }).click();
-  await page
-    .getByRole('button', { name: 'BASIC STRATEGY Rapid-fire decisions' })
-    .click();
+  await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
   await expect(
     page.getByRole('checkbox', { name: 'Dealer hits soft 17' }),
   ).toBeChecked();
@@ -115,24 +118,22 @@ test('Difficult deals edge cases continuously and changing back to Normal retain
   });
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
   // The chosen edge cell is hard 16 vs 6; Normal's same RNG deals 6,6 vs 6.
-  await expect(page.locator('.strategy-hand .hand-under')).toHaveText(
-    'HARD 16',
-  );
+  await expect(page.locator('.strategy-hand .score-pill')).toHaveText('16');
   const stand = page.getByRole('button', { name: 'Stand', exact: true });
   await stand.click();
-  await expect(page.getByRole('status')).toHaveText('Correct! Stand.');
+  await expect(
+    page.getByRole('button', { name: 'Stand', exact: true }),
+  ).toHaveClass(/strategy-correct-action/);
   await expect(stand).toBeEnabled();
-  await expect(page.locator('.strategy-hand .hand-under')).toHaveText(
-    'HARD 16',
-  );
+  await expect(page.locator('.strategy-hand .score-pill')).toHaveText('16');
   await page.getByRole('button', { name: 'Options', exact: true }).click();
   await page.getByRole('radio', { name: 'Normal', exact: false }).check();
   await page.getByRole('button', { name: 'CLOSE', exact: true }).click();
-  await expect(page.locator('.strategy-hand .hand-under')).toHaveText(
-    'HARD 12',
-  );
+  await expect(page.locator('.strategy-hand .score-pill')).toHaveText('12');
   await page.getByRole('button', { name: 'Split', exact: true }).click();
-  await expect(page.getByRole('status')).toHaveText('Correct! Split.');
+  await expect(
+    page.getByRole('button', { name: 'Split', exact: true }),
+  ).toHaveClass(/strategy-correct-action/);
   await expect(page.locator('.strategy-session-stats')).toContainText(
     'CORRECT 2 / 2',
   );
@@ -164,10 +165,15 @@ test('changing table rules mid-run resets Basic Strategy accuracy, streaks, and 
   await expect(page.getByLabel('Basic Strategy accuracy')).not.toContainText(
     '%',
   );
-  await expect(page.locator('.strategy-table-meta')).toHaveText('HAND 01');
-  await expect(page.getByRole('status')).toHaveText(
-    'Choose the correct basic strategy action.',
+  await expect(page.getByLabel('Current round', { exact: true })).toHaveText(
+    'ROUND 01',
   );
+  await expect(
+    page.getByRole('region', { name: 'Explanation', exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Hit', exact: true }),
+  ).toBeEnabled();
   await page.getByRole('button', { name: 'Options', exact: true }).click();
   await expect(
     page.getByRole('radio', { name: 'Difficult', exact: false }),
@@ -181,9 +187,7 @@ test('mode switches, resumes, and new sessions keep both modes stats separate', 
     Math.random = () => 0.4;
   });
   await page.goto('/');
-  await page
-    .getByRole('button', { name: 'FREE PLAY Classic blackjack' })
-    .click();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await page.getByRole('button', { name: 'START FREE PLAY' }).click();
   await page.getByRole('button', { name: 'DEAL CARDS' }).click();
   await expect(
@@ -197,9 +201,7 @@ test('mode switches, resumes, and new sessions keep both modes stats separate', 
     .locator('.bankvalue')
     .innerText();
   await page.getByRole('button', { name: 'Game Menu', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'BASIC STRATEGY Rapid-fire decisions' })
-    .click();
+  await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
   await page.getByRole('button', { name: 'Split', exact: true }).click();
   await expect(page.getByLabel('Basic Strategy accuracy')).toContainText(
@@ -236,6 +238,7 @@ test('timed questions pause in menus and score a timeout once before advancing',
   await page.clock.install();
   await configure(page);
   await page.getByRole('checkbox', { name: 'Timed hands' }).check();
+  await page.getByRole('checkbox', { name: 'Skip explanations' }).check();
   await page.getByRole('slider', { name: 'Seconds per hand' }).focus();
   await page.getByRole('slider', { name: 'Seconds per hand' }).press('Home');
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
@@ -246,16 +249,17 @@ test('timed questions pause in menus and score a timeout once before advancing',
   );
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await page.clock.runFor(3000);
-  await expect(page.getByRole('status')).toContainText(
-    'Time expired. Correct action:',
-  );
+  await expect(page.locator('.strategy-correct-action')).toHaveCount(1);
   await expect(page.locator('.strategy-session-stats')).toContainText(
     'TIMEOUTS 1',
   );
   await page.clock.runFor(1200);
-  await expect(page.getByRole('status')).toHaveText(
-    'Choose the correct basic strategy action.',
-  );
+  await expect(
+    page.getByRole('region', { name: 'Explanation', exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Hit', exact: true }),
+  ).toBeEnabled();
 });
 
 test('fits a phone and supports keyboard answers', async ({
@@ -280,7 +284,9 @@ test('fits a phone and supports keyboard answers', async ({
   ).toBeInViewport();
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
   await page.keyboard.press('p');
-  await expect(page.getByRole('status')).toHaveText('Correct! Split.');
+  await expect(
+    page.getByRole('button', { name: 'Split', exact: true }),
+  ).toHaveClass(/strategy-correct-action/);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(375);

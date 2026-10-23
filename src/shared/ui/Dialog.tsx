@@ -4,10 +4,12 @@ import { createPortal } from 'react-dom';
 export function Dialog({
   title,
   className = '',
+  initialFocus = 'first-control',
   children,
 }: {
   title: string;
   className?: string;
+  initialFocus?: 'first-control' | 'dialog';
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -15,14 +17,14 @@ export function Dialog({
     const previous = document.activeElement;
     const dialog = ref.current!;
     const first = dialog.querySelector<HTMLElement>(
-      '[autofocus], input:not(:disabled), button:not(:disabled), select:not(:disabled)',
+      '[autofocus], input:not(:disabled), button:not(:disabled), select:not(:disabled), a[href]',
     );
-    (first || dialog).focus();
+    (initialFocus === 'dialog' ? dialog : first || dialog).focus();
     return () => {
       if (previous instanceof HTMLElement && previous.isConnected)
         previous.focus();
     };
-  }, []);
+  }, [initialFocus]);
   return createPortal(
     <div id="overlay-host">
       <div className="overlay">
@@ -38,7 +40,7 @@ export function Dialog({
             if (event.key !== 'Tab') return;
             const controls = [
               ...event.currentTarget.querySelectorAll<HTMLElement>(
-                'button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex="0"]',
+                'button:not(:disabled), input:not(:disabled), select:not(:disabled), a[href], [tabindex="0"]',
               ),
             ];
             const first = controls[0],

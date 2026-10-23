@@ -6,6 +6,7 @@ import { PlayingCard } from './PlayingCard';
 import { PlayerHand } from './PlayerHand';
 import { ShoeMeter } from './ShoeMeter';
 import { CountPeek } from './CountPeek';
+import { RoundCounter } from '../../../shared/ui/RoundCounter';
 export function BlackjackTable() {
   const { state, rules, shoeRemaining, shoeTotal, timerSeconds } =
     useBlackjack();
@@ -115,7 +116,7 @@ export function BlackjackTable() {
             <span style={{ padding: '0 7px' }}>•</span>
             {` MAX ${money(state.maxBet)}`}
           </span>
-          <span>{`ROUND ${String(state.round).padStart(2, '0')}`}</span>
+          <RoundCounter round={state.round} />
         </div>
       </div>
     </section>

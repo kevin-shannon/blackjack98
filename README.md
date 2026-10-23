@@ -52,7 +52,7 @@ src/
       model/
         strategy.ts            Total-dependent strategy and rule variations
         questions.ts           Independent draws from all 52 cards
-        createStrategyTrainer.ts  Answer, feedback, timer, and session lifecycle
+        createStrategyTrainer.ts  Basic Strategy grading and lifecycle adapter
         settings.ts            Separate validated preference storage
         *.test.ts              Strategy and trainer regression tests
     blackjack/
@@ -65,6 +65,18 @@ src/
         cards.ts               Scoring and Hi-Lo functions
         createBlackjackGame.ts Round controller; no React or DOM dependency
         *.test.ts              Deterministic game regression tests
+    deviations/
+      Deviations.tsx           True-count decision practice screen
+      components/              H17/S17, practice sets, options, and help
+      model/
+        indices.ts             Sourced Illustrious 18 / Fab 4 index tables
+        questions.ts           Rule-specific threshold and adjacent-count deals
+        createDeviationTrainer.ts  Grading and independent session adapter
+        settings.ts            Separate validated preference storage
+    training/
+      components/DecisionPractice.tsx  Shared decision table, actions, and counters
+      model/createDecisionTrainer.ts  Shared timers, feedback, and session lifecycle
+      model/types.ts           Typed practice state, settings, and feedback
     settings/
       SettingsFields.tsx       Shared setup and live-settings controls
       settingsRepository.ts    Validated browser persistence
@@ -80,6 +92,8 @@ src/
 tests/browser/
   free-play.spec.ts            Browser workflows and optional legacy captures
   basic-strategy.spec.ts       Practice, timers, preferences, and mode isolation
+  deviations.spec.ts           Count boundaries, insurance, surrender, and mode isolation
+  practice-review.spec.ts      Manual mistake review, skip preference, and card visibility
 ```
 
 ## Behavior preserved
@@ -97,19 +111,29 @@ Dialogs now retain React-controlled fields while sliders move, keep keyboard foc
 
 ## Basic Strategy
 
-Choose Basic Strategy from the main menu, set DAS, H17, late surrender, difficulty, and optional timed hands, then start. Every question deals two player cards and one dealer upcard. One action is graded immediately, the correct action is highlighted, and the next independent question appears after 1.1 seconds. No hand plays out.
+Choose Basic Strategy from the main menu, set DAS, H17, late surrender, difficulty, and optional timed hands, then start. Every question deals two player cards and one dealer upcard. One action is graded immediately and the correct action is highlighted. Correct answers advance after 1.1 seconds. Mistakes and timeouts open a small explanation window and wait for Next hand. No hand plays out.
+
+Both drill modes offer Skip explanations, off by default, in setup and Options. Enable it to hide mistake explanations and advance after the same short feedback delay. The preference is saved separately for each mode. The explanation window is centered over the felt between the dealer and player areas on desktop and mobile, keeping cards unobscured. Feedback uses the highlighted answer buttons and explanation window, without a status box. Menus and switching modes preserve a pending review; Next hand is the only way to continue unless the user enables Skip explanations or changes the session's rules, difficulty, or practice set.
 
 Normal gives every physical card a 1/52 chance on each draw, with replacement; ten-valued ranks retain their natural combined probability of 4/13. Naturals are skipped because they have no initial decision. Difficult samples uniformly from the [rule-specific edge-case cells](docs/basic-strategy-edge-cases.md), with replacement, then varies the card composition, order, suits, and ten-valued ranks. A cell qualifies if its correct action differs from an immediately adjacent dealer upcard or player total within the same hand family. Pairs compare dealer upcards only. Both difficulties continue indefinitely.
 
 Grading uses standard total-dependent multi-deck strategy with dealer peek, doubling on any first two cards, and the selected rules, based on [Michael Shackleford's strategy reference](https://wizardofodds.com/games/blackjack/strategy/4-decks/). Deck composition and card-count deviations are not used. The Difficult pool is derived from the grading function in `model/difficultHands.ts` and follows changes to table rules.
 
-Accuracy is correct answers divided by all attempts. Timeouts count as incorrect. Streaks, misses, and timeout counts are recorded only in this mode's `BasicStrategyStats`; Free Play keeps its own `FreePlayStats` with net return, rounds, and hand outcomes. Both controllers remain alive when switching screens, and both modes can be resumed from the menu. Menus and switching away pause the trainer's decision and feedback clocks. A new session resets only the selected mode. Statistics remain in memory until page reload; no account or server persistence is added.
+Accuracy is correct answers divided by all attempts. Timeouts count as incorrect. Streaks, misses, and timeout counts are recorded only in this mode's `BasicStrategyStats`; Free Play keeps its own `FreePlayStats` with net return, rounds, and hand outcomes. Each mode's controller remains alive when switching screens and can be resumed from the menu. Menus and switching away pause the trainer's decision and feedback clocks. A new session resets only the selected mode. Statistics remain in memory until page reload; no account or server persistence is added.
 
 Basic Strategy preferences, including difficulty, use `blackjack98-basic-strategy-v1`, independently of Free Play's existing storage key. Older preferences default to Normal. Changing a table rule during practice resets the Basic Strategy session: all counters and feedback are cleared, and a fresh hand starts under the new rules with a full decision timer. Difficulty changes skip the current unscored question and retain prior accuracy. Keyboard shortcuts match Free Play: H/S/D/P/R.
 
+## Deviations
+
+Choose H17 or S17 and practice the Illustrious 18, Fab 4, or both. Each question shows a two-card hand, dealer upcard, and integer Hi-Lo true count. Select one action and receive immediate feedback. Mistakes show a brief explanation of the index and wait for Next hand unless Skip explanations is enabled. Every eligible index has an equal chance of being chosen; each side of its boundary has a 50% chance. For a stand index of +2, questions show +1 (hit) or +2 (stand). Negative indices work the same way: a stand index of -2 produces -3 (hit) or -2 (stand).
+
+Indices use the six-deck, dealer-peek convention documented in [the deviation reference](docs/deviations.md), with doubling on any initial two cards. Player card compositions, order, ten-valued ranks, and suits vary without changing the decision being tested. Insurance is included in the 18 and uses Take insurance / Decline insurance actions, including I/N shortcuts. Other hands use H/S/D/P and R when surrender applies. The index is revealed only in mistake explanations.
+
+Illustrious 18 questions explicitly assume no surrender; Fab 4 questions explicitly offer late surrender. This avoids conflicting answers on overlapping hands such as 15 vs 10. Deviations has its own `DeviationsStats` and `blackjack98-deviations-v1` preferences. Timed questions and menus behave like Basic Strategy. Changing table rules or the practice set resets only the Deviations session; other modes retain their results. The shared practice screen and lifecycle live in `features/training`, while index data, dealing, grading, and settings remain in `features/deviations`.
+
 ## Adding features later
 
-**Training modes:** create a feature directory with its screen and training logic, register its metadata in `app/trainingModes.ts`, then extend `ModeNavigation.tsx` and the mode switch in `App.tsx`. Give the controller its own typed session stats and preference key. Reuse card scoring, artwork, settings controls, and `GameWindow` where appropriate. Modes currently use an application-level switch without URL routing.
+**Training modes:** create a feature directory with its screen and training logic, register its metadata in `app/trainingModes.ts`, then extend `ModeNavigation.tsx` and the mode switch in `App.tsx`. Give the controller its own typed session stats and preference key. Decision drills can reuse `features/training` with their own typed question generation, grading, action availability, and settings. Other modes can reuse card scoring, artwork, settings controls, and `GameWindow` where appropriate. Modes currently use an application-level switch without URL routing.
 
 **Achievements and progress:** `createBlackjackGame` accepts an optional `onRoundComplete` callback. It receives the mode, round number, net result, bankroll, hand results, and rules once settlement finishes. A future application service can consume that event. Add more detailed decision events when a training mode needs them; the current event does not contain decision history. The settings repository is injectable for tests and future storage adapters.
 

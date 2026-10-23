@@ -3,7 +3,12 @@ import type { StrategySettings } from './types';
 
 export const DEFAULT_STRATEGY_SETTINGS: StrategySettings = {
   rules: { doubleAfterSplit: true, hitSoft17: false, surrender: false },
-  options: { difficulty: 'normal', timedHands: false, seconds: 10 },
+  options: {
+    difficulty: 'normal',
+    skipExplanations: false,
+    timedHands: false,
+    seconds: 10,
+  },
 };
 const KEY = 'blackjack98-basic-strategy-v1';
 export interface StrategySettingsRepository {
@@ -25,6 +30,7 @@ export function parseStrategySettings(value: unknown): StrategySettings {
       surrender: bool(rules.surrender, false),
     },
     options: {
+      skipExplanations: bool(options.skipExplanations, false),
       difficulty: options.difficulty === 'difficult' ? 'difficult' : 'normal',
       timedHands: bool(options.timedHands, false),
       seconds:

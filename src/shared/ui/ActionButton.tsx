@@ -1,8 +1,8 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 export function ActionButton({
   className = '',
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>) {
+}: ComponentPropsWithRef<'button'>) {
   return (
     <button type="button" className={`action-btn ${className}`} {...props} />
   );

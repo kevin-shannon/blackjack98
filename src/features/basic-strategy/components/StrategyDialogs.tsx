@@ -86,10 +86,10 @@ export function StrategyDialogs() {
       >
         <h2>GAME OPTIONS</h2>
         <div className="setting-hint">
-          Each answer shows feedback briefly before the next hand. Timeouts
-          count as incorrect; menus pause both the decision clock and the next
-          hand. Changing difficulty skips the current question without scoring
-          it; accuracy stays intact.
+          Correct answers advance automatically. After a mistake or timeout,
+          review the explanation and choose Next hand. Enable Skip explanations
+          to advance automatically after every answer. Changing difficulty keeps
+          your accuracy.
         </div>
         <div className="settings-form">
           <StrategyOptionFields
@@ -130,8 +130,9 @@ export function StrategyDialogs() {
             dealer's upcard.
           </li>
           <li>
-            The decision is graded immediately. The hand does not play out, and
-            the next question starts automatically.
+            The decision is graded immediately. Correct answers advance
+            automatically. Mistakes and timeouts show an explanation and wait
+            for Next hand, unless Skip explanations is enabled.
           </li>
           <li>
             Normal draws cards with replacement: every card remains equally

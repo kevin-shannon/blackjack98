@@ -8,8 +8,8 @@ export interface FreePlayStats {
   losses: number;
   pushes: number;
 }
-export interface BasicStrategyStats {
-  modeId: 'basic-strategy';
+export interface PracticeStats<Mode extends string = string> {
+  modeId: Mode;
   attempts: number;
   correct: number;
   incorrect: number;
@@ -17,9 +17,12 @@ export interface BasicStrategyStats {
   streak: number;
   bestStreak: number;
 }
+export type BasicStrategyStats = PracticeStats<'basic-strategy'>;
+export type DeviationsStats = PracticeStats<'deviations'>;
 export interface StatsByMode {
   'free-play': FreePlayStats;
   'basic-strategy': BasicStrategyStats;
+  deviations: DeviationsStats;
 }
 export const createFreePlayStats = (): FreePlayStats => ({
   modeId: 'free-play',
@@ -29,8 +32,10 @@ export const createFreePlayStats = (): FreePlayStats => ({
   losses: 0,
   pushes: 0,
 });
-export const createBasicStrategyStats = (): BasicStrategyStats => ({
-  modeId: 'basic-strategy',
+export const createPracticeStats = <Mode extends string>(
+  modeId: Mode,
+): PracticeStats<Mode> => ({
+  modeId,
   attempts: 0,
   correct: 0,
   incorrect: 0,
@@ -38,6 +43,8 @@ export const createBasicStrategyStats = (): BasicStrategyStats => ({
   streak: 0,
   bestStreak: 0,
 });
+export const createBasicStrategyStats = (): BasicStrategyStats =>
+  createPracticeStats('basic-strategy');
 export function recordFreePlayRound(
   stats: FreePlayStats,
   results: HandResult[],
@@ -58,11 +65,11 @@ export function recordFreePlayRound(
         .length,
   };
 }
-export function recordStrategyAnswer(
-  stats: BasicStrategyStats,
+export function recordStrategyAnswer<T extends PracticeStats>(
+  stats: T,
   correct: boolean,
   timedOut = false,
-): BasicStrategyStats {
+): T {
   const streak = correct ? stats.streak + 1 : 0;
   return {
     ...stats,
@@ -74,5 +81,5 @@ export function recordStrategyAnswer(
     bestStreak: Math.max(stats.bestStreak, streak),
   };
 }
-export const accuracy = (stats: BasicStrategyStats) =>
+export const accuracy = (stats: PracticeStats) =>
   stats.attempts ? (stats.correct / stats.attempts) * 100 : 0;

@@ -1,0 +1,52 @@
+.deviation-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: #fff;
+  color: #000080;
+  border: 2px solid;
+  border-color: #777 #fff #fff #777;
+  text-shadow: none;
+}
+.deviation-count span {
+  font-size: 10px;
+}
+.deviation-count b {
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+}
+.deviation-context {
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  color: #fff2b7;
+}
+.deviation-set-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.strategy-actions + .action-note {
+  flex-wrap: wrap;
+}
+.action-note > span {
+  white-space: nowrap;
+}
+@media (max-width: 460px) {
+  .deviation-count {
+    gap: 4px;
+    padding: 3px 5px;
+  }
+  .deviation-count span {
+    font-size: 8px;
+    max-width: 38px;
+  }
+  .deviation-count b {
+    font-size: 17px;
+  }
+  .deviation-set-options {
+    grid-template-columns: 1fr;
+  }
+}

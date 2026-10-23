@@ -79,5 +79,22 @@ export function explainDecision(
   const hand = pair
     ? `Pair of ${cards[0].rank === 'A' ? 'aces' : value(cards[0]) === 10 ? 'tens' : `${cards[0].rank}s`}`
     : `${result.soft ? 'Soft' : 'Hard'} ${result.total}`;
-  return `${hand} vs dealer ${dealer.rank}: ${ACTION_LABELS[recommendAction(cards, dealer, rules)].toLowerCase()}.`;
+  const action = recommendAction(cards, dealer, rules);
+  const reason =
+    action === 'surrender'
+      ? 'Late surrender limits the loss against this strong dealer upcard.'
+      : action === 'split'
+        ? `Splitting is preferred for this pair against this upcard${rules.doubleAfterSplit ? ' with double after split allowed' : ' under the no-DAS rules'}.`
+        : action === 'double'
+          ? `This is a doubling opportunity under the selected ${rules.hitSoft17 ? 'H17' : 'S17'} rules.`
+          : action === 'stand'
+            ? result.soft || result.total >= 17
+              ? 'Keep this strong total rather than drawing another card.'
+              : 'Let the dealer risk busting against this weak upcard.'
+            : result.soft
+              ? 'The Ace keeps this hand flexible; draw to improve it against this upcard.'
+              : result.total < 12
+                ? 'Draw to improve this low hard total.'
+                : 'This total is too weak to stand against this upcard, despite the risk of busting.';
+  return `${hand} vs dealer ${dealer.rank}: ${ACTION_LABELS[action].toLowerCase()}. ${reason}`;
 }

@@ -1,8 +1,33 @@
+.menu-modal:focus {
+  outline: none;
+}
 .menu-modal .mode-tile + .mode-tile {
-  margin-top: 10px;
+  margin-top: 7px;
+}
+.menu-modal .mode-tile {
+  padding: 10px;
+  border-width: 2px;
+}
+.menu-modal .mode-tile strong {
+  font-size: 15px;
+  letter-spacing: 0;
+}
+.menu-modal .mode-tile small {
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.mode-tile .mode-arrow {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
 }
 .menu-utilities .action-btn + .action-btn {
   margin-top: 8px;
+}
+.menu-modal .menu-utilities:not(:empty) {
+  margin-top: 16px;
 }
 .strategy-table-meta {
   display: flex;
@@ -11,14 +36,6 @@
 }
 .strategy-feedback-area {
   min-height: 130px;
-}
-.strategy-explanation {
-  min-height: 30px;
-  max-width: 95%;
-  text-align: center;
-  font-size: 11px;
-  color: #fff;
-  line-height: 1.5;
 }
 .strategy-hand {
   min-width: 176px;
@@ -99,4 +116,40 @@
   .strategy-table-meta {
     gap: 6px;
   }
+}
+.mode-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 8px;
+  color: #555;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+}
+.mode-group-title::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid #999;
+  box-shadow: 0 1px #fff;
+}
+.menu-modal .menu-welcome h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 7px;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+.menu-welcome img {
+  flex: none;
+  image-rendering: pixelated;
+}
+.menu-modal .menu-welcome p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #333;
 }

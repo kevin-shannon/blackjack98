@@ -3,12 +3,20 @@ export const trainingModes = [
   {
     id: 'basic-strategy',
     title: 'BASIC STRATEGY',
-    description: 'Rapid-fire decisions · Instant feedback',
+    description: 'Drill until you know the basics',
+    category: 'train',
+  },
+  {
+    id: 'deviations',
+    title: 'DEVIATIONS',
+    description: 'Learn when to bend the rules',
+    category: 'train',
   },
   {
     id: 'free-play',
     title: 'FREE PLAY',
-    description: 'Classic blackjack · Virtual bankroll',
+    description: 'Build a bankroll at your own pace with what you’ve learned',
+    category: 'play',
   },
 ] as const;
 export type TrainingModeId = (typeof trainingModes)[number]['id'];

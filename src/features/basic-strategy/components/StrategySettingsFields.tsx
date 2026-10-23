@@ -79,6 +79,12 @@ export function StrategyOptionFields({
         </div>
       </fieldset>
       <Checkbox
+        label="Skip explanations"
+        checked={options.skipExplanations}
+        onChange={(v) => onChange('skipExplanations', v)}
+        description="Move on automatically after mistakes. Turn off to review the correct move and start the next hand yourself."
+      />
+      <Checkbox
         label="Timed hands"
         checked={options.timedHands}
         onChange={(v) => onChange('timedHands', v)}

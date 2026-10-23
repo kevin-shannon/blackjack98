@@ -19,6 +19,7 @@ function practice(timed = false) {
         rules: { ...DEFAULT_STRATEGY_SETTINGS.rules },
         options: {
           ...DEFAULT_STRATEGY_SETTINGS.options,
+          skipExplanations: true,
           timedHands: timed,
           seconds: 3,
         },

@@ -8,6 +8,7 @@ export interface StrategyRules {
 }
 export type StrategyDifficulty = 'normal' | 'difficult';
 export interface StrategyOptions {
+  skipExplanations: boolean;
   difficulty: StrategyDifficulty;
   timedHands: boolean;
   seconds: number;
@@ -33,7 +34,7 @@ export interface StrategyFeedback {
 export interface StrategyState {
   started: boolean;
   panel: StrategyPanel;
-  phase: 'idle' | 'answering' | 'feedback';
+  phase: 'idle' | 'answering' | 'feedback' | 'review';
   question: StrategyQuestion | null;
   feedback: StrategyFeedback | null;
   stats: BasicStrategyStats;
