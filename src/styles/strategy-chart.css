@@ -1,0 +1,108 @@
+.practice-review-actions {
+  display: flex;
+  gap: 8px;
+}
+.practice-review-actions .action-btn {
+  flex: 1;
+  min-width: 0;
+  padding-inline: 6px;
+}
+.strategy-chart-modal {
+  width: min(100%, 580px);
+}
+.strategy-chart-modal:focus {
+  outline: none;
+}
+.strategy-chart-modal h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+.strategy-chart-modal .chart-rules {
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+.chart-scroll {
+  overflow: auto;
+  max-height: 55dvh;
+  border: 2px solid;
+  border-color: #808080 #fff #fff #808080;
+  background: #fff;
+}
+.strategy-chart {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+}
+.strategy-chart-modal .chart-instructions {
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.strategy-chart th,
+.strategy-chart td {
+  height: 24px;
+  min-width: 30px;
+  padding: 3px 5px;
+  border: 1px solid #a0a0a0;
+}
+.strategy-chart th {
+  background: #dfdfdf;
+  white-space: nowrap;
+}
+.strategy-chart tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.strategy-chart thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.strategy-chart thead th:first-child {
+  left: 0;
+  z-index: 3;
+}
+[data-chart-action='hit'] {
+  background: #c8e6bf;
+}
+[data-chart-action='stand'] {
+  background: #f2b8b5;
+}
+[data-chart-action='double'] {
+  background: #ffec9b;
+}
+[data-chart-action='split'] {
+  background: #b8d7f0;
+}
+[data-chart-action='surrender'] {
+  background: #dfc4ee;
+}
+.strategy-chart .chart-heading-current {
+  background: #c0c0c0;
+  box-shadow: inset 1px 1px #808080;
+}
+.strategy-chart .chart-current {
+  background: #000080;
+  color: #fff;
+  font-weight: 700;
+  outline: 1px dotted #ffff80;
+  outline-offset: -4px;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-size: 11px;
+}
+.chart-legend b {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border: 1px solid #808080;
+  color: #111;
+}

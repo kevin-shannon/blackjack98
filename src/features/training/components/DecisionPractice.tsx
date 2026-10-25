@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from 'react';
 import type { ReactNode } from 'react';
+import smileyIcon from '../../../assets/smiley.png';
 import { GameWindow } from '../../../shared/ui/GameWindow';
 import { ActionButton } from '../../../shared/ui/ActionButton';
 import { RoundCounter } from '../../../shared/ui/RoundCounter';
@@ -30,6 +31,8 @@ export function DecisionPractice<
   questionTitle = "WHAT'S YOUR MOVE?",
   extraMeta,
   context,
+  reviewActions,
+  reviewModalOpen = false,
 }: {
   trainer: {
     getSnapshot(): { state: PracticeState<Question, Action, Mode> };
@@ -50,6 +53,8 @@ export function DecisionPractice<
   questionTitle?: string;
   extraMeta?: ReactNode;
   context?: ReactNode;
+  reviewActions?: ReactNode;
+  reviewModalOpen?: boolean;
 }) {
   const explanationId = useId();
   const reviewing = state.phase === 'review';
@@ -61,6 +66,7 @@ export function DecisionPractice<
     actions.find((entry) => entry.action === action)?.label ?? action;
   useEffect(() => {
     function keydown(event: KeyboardEvent) {
+      if (reviewModalOpen) return;
       if (
         event.defaultPrevented ||
         event.ctrlKey ||
@@ -93,7 +99,7 @@ export function DecisionPractice<
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [trainer, actions]);
+  }, [trainer, actions, reviewModalOpen]);
   const question = state.question,
     feedback = state.feedback;
   const correct = feedback?.correct;
@@ -108,7 +114,7 @@ export function DecisionPractice<
     <>
       <GameWindow
         started={state.started}
-        modalOpen={Boolean(state.panel)}
+        modalOpen={Boolean(state.panel) || reviewModalOpen}
         title={title}
         rulesSummary={rulesSummary}
         onMenu={() => trainer.openPanel('menu')}
@@ -189,7 +195,18 @@ export function DecisionPractice<
               >
                 {!reviewing && (
                   <>
-                    <div className="felt-rule">{questionTitle}</div>
+                    <div
+                      className={`felt-rule${correct ? ' practice-correct' : ''}`}
+                    >
+                      {correct ? (
+                        <>
+                          CORRECT{' '}
+                          <img src={smileyIcon} width={24} height={24} alt="" />
+                        </>
+                      ) : (
+                        questionTitle
+                      )}
+                    </div>
                     {context}
                   </>
                 )}
@@ -210,15 +227,18 @@ export function DecisionPractice<
                     <h2>{actionLabel(state.feedback.expected)}</h2>
                     {context}
                     <p id={explanationId}>{state.feedback.explanation}</p>
-                    <ActionButton
-                      ref={nextHandRef}
-                      className="primary wide"
-                      onClick={trainer.nextHand}
-                      aria-describedby={explanationId}
-                      autoFocus
-                    >
-                      Next hand
-                    </ActionButton>
+                    <div className="practice-review-actions">
+                      <ActionButton
+                        ref={nextHandRef}
+                        className="primary wide"
+                        onClick={trainer.nextHand}
+                        aria-describedby={explanationId}
+                        autoFocus
+                      >
+                        Next hand
+                      </ActionButton>
+                      {reviewActions}
+                    </div>
                   </aside>
                 )}
               </div>

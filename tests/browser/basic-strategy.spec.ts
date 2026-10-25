@@ -28,6 +28,7 @@ test('gives instant feedback, updates accuracy, and deals another independent ha
   await expect(page.getByRole('button', { name: 'Peek count' })).toHaveCount(0);
   const split = page.getByRole('button', { name: 'Split', exact: true });
   await split.click();
+  await expect(page.locator('.practice-correct')).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Split', exact: true }),
   ).toHaveClass(/strategy-correct-action/);
@@ -41,6 +42,7 @@ test('gives instant feedback, updates accuracy, and deals another independent ha
   await expect(page.locator('.dealer-area .seat-label')).toHaveText('Dealer 6');
   await expect(page.locator('.strategy-hand .hand-under')).toHaveCount(0);
   await expect(split).toBeEnabled();
+  await expect(page.locator('.practice-correct')).toHaveCount(0);
   await page.getByRole('button', { name: 'Stand', exact: true }).click();
   await expect(
     page

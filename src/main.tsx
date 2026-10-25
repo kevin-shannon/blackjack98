@@ -10,6 +10,7 @@ import './styles/buttons.css';
 import './styles/cards.css';
 import './styles/wagers.css';
 import './styles/dialogs.css';
+import './styles/strategy-chart.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

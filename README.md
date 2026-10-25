@@ -123,6 +123,8 @@ Grading uses standard total-dependent multi-deck strategy with dealer peek, doub
 
 Accuracy is correct answers divided by all attempts. Timeouts count as incorrect. Streaks, misses, and timeout counts are recorded only in this mode's `BasicStrategyStats`; Free Play keeps its own `FreePlayStats` with net return, rounds, and hand outcomes. The menu has a single Resume Game button for the current run. Opening menus pauses the trainer's decision and feedback clocks. Selecting a different mode discards the previous session, cancels pending timers or dealing, and clears its counters. Returning to that mode starts fresh; saved options remain available. Statistics remain in memory until page reload; no account or server persistence is added.
 
+Basic Strategy mistake and timeout explanations include Show strategy chart. It opens a Windows-style reference window for the current hard, soft, or pair hand, highlights the hand/upcard cell, and uses the same rule-dependent recommendations as grading. Chart headers stay visible while scrolling on phones; closing returns to the same review without advancing or changing accuracy. Deviations does not include this chart.
+
 Basic Strategy preferences, including difficulty, use `blackjack98-basic-strategy-v1`, independently of Free Play's existing storage key. Older preferences default to Normal. Changing a table rule during practice resets the Basic Strategy session: all counters and feedback are cleared, and a fresh hand starts under the new rules with a full decision timer. Difficulty changes skip the current unscored question and retain prior accuracy. Keyboard shortcuts match Free Play: H/S/D/P/R.
 
 ## Deviations

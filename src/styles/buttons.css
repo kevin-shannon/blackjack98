@@ -48,13 +48,9 @@
   outline: 1px dotted #000;
   outline-offset: -6px;
 }
-.strategy-correct-action::before,
 .strategy-wrong-action::before {
   margin-right: 6px;
   font-weight: 700;
-}
-.strategy-correct-action::before {
-  content: '\2713' / '';
 }
 .strategy-wrong-action::before {
   content: '\00d7' / '';
@@ -103,7 +99,6 @@
     padding-inline: 2px;
     font-size: 11px;
   }
-  .strategy-correct-action::before,
   .strategy-wrong-action::before {
     position: absolute;
     top: 1px;

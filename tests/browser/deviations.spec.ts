@@ -39,6 +39,7 @@ test('grades a count boundary, shows feedback, and keeps dealing with isolated a
   ).toHaveCount(0);
   const hit = page.getByRole('button', { name: 'Hit', exact: true });
   await hit.click();
+  await expect(page.locator('.practice-correct')).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Hit', exact: true }),
   ).toHaveClass(/strategy-correct-action/);
@@ -55,6 +56,7 @@ test('grades a count boundary, shows feedback, and keeps dealing with isolated a
     fullPage: true,
   });
   await expect(hit).toBeEnabled();
+  await expect(page.locator('.practice-correct')).toHaveCount(0);
   await page.getByRole('button', { name: 'Double', exact: true }).click();
   await expect(
     page

@@ -4,6 +4,15 @@
 .strategy-feedback-area {
   position: relative;
 }
+.practice-correct {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #bdff98;
+}
+.practice-correct img {
+  image-rendering: pixelated;
+}
 .strategy-feedback-area.is-reviewing {
   /* Keep the popup above the following player area so it receives pointer clicks. */
   z-index: 3;
