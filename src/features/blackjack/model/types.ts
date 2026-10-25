@@ -7,7 +7,7 @@ export interface Card {
   rank: Rank;
   id: number;
 }
-export type Payout = '3:2' | '6:5' | '1:1' | '2:1';
+export type Payout = '3:2' | '6:5';
 export interface TableRules {
   decks: number;
   penetration: number;

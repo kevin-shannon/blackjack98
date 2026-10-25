@@ -172,7 +172,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     )
       return false;
     if (value(h.cards[0]) !== value(h.cards[1])) return false;
-    // Re-splitting Aces is separately configurable; split Ace hands may otherwise play normally.
+    // A new pair of Aces can be resplit when RSA allows it.
     if (h.splitAces)
       return (
         roundRules.resplitAces &&
@@ -185,12 +185,26 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     return (
       !!h &&
       h.cards.length === 2 &&
+      !h.splitAces &&
       (!h.fromSplit || roundRules.doubleAfterSplit) &&
       state.bankroll >= h.bet
     );
   }
   function canHit(h: Hand | undefined) {
-    return !!h && score(h.cards).total < 21;
+    return !!h && !h.splitAces && score(h.cards).total < 21;
+  }
+  function finishRestrictedAceHands() {
+    for (const hand of state.hands) {
+      if (
+        hand.splitAces &&
+        !hand.complete &&
+        hand.cards.length === 2 &&
+        !canSplit(hand)
+      ) {
+        hand.complete = true;
+        hand.status = 'stand';
+      }
+    }
   }
   function canSurrender(h: Hand | undefined) {
     return (
@@ -397,14 +411,15 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
       h.splitAces = isAces || h.splitAces;
       state.hands.splice(state.active + 1, 0, sister);
       state.message = h.splitAces
-        ? 'Aces split. Play each hand normally.'
+        ? 'Aces split. One card per Ace.'
         : 'Pair split. Playing first hand.';
       render();
       await wait(110);
       await dealTo('player', state.active);
       await dealTo('player', state.active + 1);
-      // Split Ace hands remain active after receiving their second cards.
-      // The Resplit Aces option controls only whether another pair of Aces may split.
+      finishRestrictedAceHands();
+      if (h.splitAces && !h.complete)
+        state.message = 'Split Aces: resplit this pair or stand.';
       startTimer();
     }
     if (h.complete) {
@@ -424,6 +439,8 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
       state.active = next;
       state.busy = false;
       state.message = `Playing hand ${next + 1} of ${state.hands.length}.`;
+      if (state.hands[next].splitAces)
+        state.message = `Hand ${next + 1}: resplit these Aces or stand.`;
       startTimer();
       render();
       return;
@@ -458,9 +475,7 @@ export function createBlackjackGame(dependencies: GameDependencies = {}) {
     settle();
   }
   function payoutMultiplier() {
-    return (
-      { '3:2': 2.5, '6:5': 2.2, '1:1': 2, '2:1': 3 }[roundRules.payout] || 2.5
-    );
+    return { '3:2': 2.5, '6:5': 2.2 }[roundRules.payout] || 2.5;
   }
   function settle() {
     stopTimer();

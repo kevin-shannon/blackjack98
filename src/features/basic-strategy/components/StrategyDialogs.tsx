@@ -49,9 +49,9 @@ export function StrategyDialogs() {
           </div>
         </div>
         <div className="modal-actions setup-actions">
-          <ActionButton onClick={trainer.backToMenu}>◀ BACK</ActionButton>
+          <ActionButton onClick={trainer.backToMenu}>BACK</ActionButton>
           <ActionButton className="primary" onClick={trainer.start}>
-            START BASIC STRATEGY ▶
+            START BASIC STRATEGY
           </ActionButton>
         </div>
       </Dialog>

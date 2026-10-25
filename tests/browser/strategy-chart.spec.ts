@@ -77,7 +77,7 @@ for (const scenario of cases) {
       .getByRole('checkbox', { name: 'Double after split' })
       .setChecked(scenario.das);
     await page
-      .getByRole('checkbox', { name: 'Allow surrender' })
+      .getByRole('checkbox', { name: 'Late surrender (LS)' })
       .setChecked(scenario.surrender);
     await page.evaluate(() =>
       (Math.random as typeof Math.random & { reset(): void }).reset(),

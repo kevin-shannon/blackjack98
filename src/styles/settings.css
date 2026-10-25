@@ -1,6 +1,111 @@
 .settings-modal {
   padding-bottom: 15px;
 }
+.classic-select {
+  position: relative;
+  min-width: 130px;
+  font:
+    12px Tahoma,
+    Arial,
+    sans-serif;
+  font-weight: 400;
+}
+.classic-select-control {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 25px;
+  padding: 2px;
+  border: 2px solid;
+  border-color: #808080 #fff #fff #808080;
+  border-radius: 0;
+  box-shadow: inset 1px 1px #000;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+.classic-select-control:focus-visible {
+  outline: none;
+}
+.classic-select-value {
+  flex: 1;
+  padding: 1px 4px;
+}
+.classic-select-control:focus-visible .classic-select-value {
+  background: #000080;
+  color: #fff;
+  outline: 1px dotted #fff;
+  outline-offset: -1px;
+}
+.classic-select-arrow {
+  display: grid;
+  place-items: center;
+  width: 17px;
+  margin: -1px;
+  border: 2px solid;
+  border-color: #fff #000 #000 #fff;
+  box-shadow: inset -1px -1px #808080;
+  background: #c0c0c0;
+}
+.classic-select-arrow::after {
+  content: '';
+  width: 7px;
+  height: 4px;
+  background: #000;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 25%,
+    86% 25%,
+    86% 50%,
+    71% 50%,
+    71% 75%,
+    57% 75%,
+    57% 100%,
+    43% 100%,
+    43% 75%,
+    29% 75%,
+    29% 50%,
+    14% 50%,
+    14% 25%,
+    0 25%
+  );
+}
+.classic-select-control[aria-expanded='true'] .classic-select-arrow {
+  border-color: #808080 #fff #fff #808080;
+  box-shadow: none;
+}
+.classic-select-list {
+  position: absolute;
+  z-index: 10;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 1px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  box-shadow: none;
+}
+.classic-select-option {
+  padding: 3px 5px;
+  cursor: default;
+}
+.classic-select-option.active {
+  background: #000080;
+  color: #fff;
+}
+.checkbox-copy .rule-frequency {
+  display: inline-block;
+  margin-left: 8px;
+  color: #555;
+  font-size: 10px;
+  font-weight: 400;
+  white-space: nowrap;
+}
 .checkbox-row input[type='checkbox']:checked::after {
   content: '';
   position: absolute;

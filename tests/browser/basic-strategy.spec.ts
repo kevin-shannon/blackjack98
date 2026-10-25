@@ -75,8 +75,8 @@ test('offers only relevant settings and persists them independently of Free Play
     page.getByRole('radio', { name: 'Normal', exact: false }),
   ).toBeChecked();
   await page.getByRole('radio', { name: 'Difficult', exact: false }).check();
-  await page.getByRole('checkbox', { name: 'Dealer hits soft 17' }).check();
-  await page.getByRole('checkbox', { name: 'Allow surrender' }).check();
+  await page.getByRole('checkbox', { name: 'Dealer hits soft 17' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Late surrender (LS)' }).check();
   await page.getByRole('checkbox', { name: 'Double after split' }).uncheck();
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
   await expect(
@@ -86,17 +86,17 @@ test('offers only relevant settings and persists them independently of Free Play
   await page.getByRole('button', { name: /^FREE PLAY / }).click();
   await expect(
     page.getByRole('checkbox', { name: 'Dealer hits soft 17' }),
-  ).not.toBeChecked();
+  ).toBeChecked();
   await expect(
-    page.getByRole('checkbox', { name: 'Allow surrender' }),
+    page.getByRole('checkbox', { name: 'Late surrender (LS)' }),
   ).not.toBeChecked();
   await page.getByRole('button', { name: 'BACK' }).click();
   await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
   await expect(
     page.getByRole('checkbox', { name: 'Dealer hits soft 17' }),
-  ).toBeChecked();
+  ).not.toBeChecked();
   await expect(
-    page.getByRole('checkbox', { name: 'Allow surrender' }),
+    page.getByRole('checkbox', { name: 'Late surrender (LS)' }),
   ).toBeChecked();
   await expect(
     page.getByRole('checkbox', { name: 'Double after split' }),

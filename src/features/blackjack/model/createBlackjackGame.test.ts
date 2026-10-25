@@ -169,8 +169,6 @@ describe('rounds and payouts', () => {
   it.each([
     ['3:2', 1037.5],
     ['6:5', 1030],
-    ['1:1', 1025],
-    ['2:1', 1050],
   ] as const)('pays a natural at %s', async (payout, expected) => {
     const { game, state, completed } = scenario(['A', '9', 'K', '8'], {
       payout,
@@ -249,27 +247,101 @@ describe('rounds and payouts', () => {
   });
 });
 describe('splitting and cancellation', () => {
-  it('plays split aces normally and pays split 21 as a regular win', async () => {
-    const { game, state } = scenario(['A', '10', 'A', '7', 'K', '9']);
-    await finish(game.deal());
-    await finish(game.act('split'));
-    expect(state().hands).toHaveLength(2);
-    expect(state().hands[0].complete).toBe(false);
-    await finish(game.act('stand'));
-    await finish(game.act('stand'));
-    expect(state().hands.map((hand) => hand.result)).toEqual(['WIN', 'WIN']);
-    expect(state().bankroll).toBe(1050);
-  });
-  it('allows resplitting aces only when configured', async () => {
-    for (const resplitAces of [false, true]) {
+  it.each([false, true])(
+    'offers another Ace split only with RSA=%s',
+    async (resplitAces) => {
       const { game, state } = scenario(['A', '10', 'A', '7', 'A', '9'], {
         resplitAces,
       });
       await finish(game.deal());
       await finish(game.act('split'));
       expect(game.canSplit(state().hands[0])).toBe(resplitAces);
-    }
+      expect(game.canHit(state().hands[0])).toBe(false);
+      expect(game.canDouble(state().hands[0])).toBe(false);
+      expect(state().phase).toBe(resplitAces ? 'playing' : 'roundOver');
+    },
+  );
+  it('defaults to one card per split Ace and pays split 21 as an ordinary win', async () => {
+    const { game, state } = scenario(['A', '10', 'A', '7', 'K', '9']);
+    await finish(game.deal());
+    await finish(game.act('split'));
+    expect(state().phase).toBe('roundOver');
+    expect(state().hands.map((hand) => hand.cards.length)).toEqual([2, 2]);
+    expect(state().hands.map((hand) => hand.result)).toEqual(['WIN', 'WIN']);
+    expect(state().bankroll).toBe(1050);
+    expect(state().stats.completedRounds).toBe(1);
   });
+  it('automatically skips a finished Ace hand to offer RSA on the next one', async () => {
+    const { game, state } = scenario(['A', '10', 'A', '7', '5', 'A'], {
+      resplitAces: true,
+    });
+    await finish(game.deal());
+    await finish(game.act('split'));
+    expect(state().active).toBe(1);
+    expect(state().hands[0].complete).toBe(true);
+    expect(game.canSplit(state().hands[1])).toBe(true);
+    expect(game.canHit(state().hands[1])).toBe(false);
+    expect(game.canDouble(state().hands[1])).toBe(false);
+    await game.act('hit');
+    await game.act('double');
+    expect(state().hands[1].cards).toHaveLength(2);
+    expect(state().bankroll).toBe(950);
+    await finish(game.act('stand'));
+    expect(state().phase).toBe('roundOver');
+  });
+  it('resplits up to four hands and then completes remaining Ace pairs', async () => {
+    const { game, state } = scenario(
+      ['A', '10', 'A', '7', 'A', 'A', '5', '6', 'A', 'A'],
+      { resplitAces: true },
+    );
+    await finish(game.deal());
+    await finish(game.act('split'));
+    expect(state().hands).toHaveLength(2);
+    await finish(game.act('split'));
+    expect(state().hands).toHaveLength(3);
+    expect(state().active).toBe(2);
+    expect(
+      state()
+        .hands.slice(0, 2)
+        .every((hand) => hand.complete),
+    ).toBe(true);
+    await finish(game.act('split'));
+    expect(state().hands).toHaveLength(4);
+    expect(
+      state().hands.every((hand) => hand.complete && hand.cards.length === 2),
+    ).toBe(true);
+    expect(state().phase).toBe('roundOver');
+    expect(state().bankroll).toBe(925);
+  });
+  it('finishes a new Ace pair when there are no funds to resplit', async () => {
+    const { game, state } = scenario(
+      ['A', '10', 'A', '7', 'A', '9'],
+      { resplitAces: true },
+      { startingBankroll: 50 },
+    );
+    await finish(game.deal());
+    await finish(game.act('split'));
+    expect(state().phase).toBe('roundOver');
+    expect(state().hands.every((hand) => hand.complete)).toBe(true);
+  });
+  it.each([false, true])(
+    'split Aces cannot hit or double even with DAS=%s',
+    async (doubleAfterSplit) => {
+      const { game, state } = scenario(['A', '10', 'A', '7', 'A', '6', '2'], {
+        resplitAces: true,
+        doubleAfterSplit,
+      });
+      await finish(game.deal());
+      await finish(game.act('split'));
+      expect(game.canHit(state().hands[0])).toBe(false);
+      expect(game.canDouble(state().hands[0])).toBe(false);
+      await game.act('hit');
+      await game.act('double');
+      expect(state().hands[0].cards).toHaveLength(2);
+      expect(state().hands[0].doubled).toBe(false);
+      expect(state().bankroll).toBe(950);
+    },
+  );
   it('enforces double after split', async () => {
     const { game, state } = scenario(['8', '10', '8', '7', '3', '2'], {
       doubleAfterSplit: false,

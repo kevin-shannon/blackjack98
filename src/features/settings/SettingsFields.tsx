@@ -1,5 +1,6 @@
 import type { GameOptions, TableRules } from '../blackjack/model/types';
 import { money } from '../../shared/lib/format';
+import { ClassicSelect } from '../../shared/ui/ClassicSelect';
 import {
   BANKROLL_VALUES,
   MIN_BET_VALUES,
@@ -53,11 +54,13 @@ export function Checkbox({
   label,
   checked,
   description,
+  frequency,
   onChange,
 }: {
   label: string;
   checked: boolean;
   description: string;
+  frequency?: string;
   onChange: (value: boolean) => void;
 }) {
   return (
@@ -68,7 +71,10 @@ export function Checkbox({
         onChange={(event) => onChange(event.target.checked)}
       />
       <span className="checkbox-copy">
-        <strong>{label}</strong>
+        <strong>
+          {label}
+          {frequency && <span className="rule-frequency">{frequency}</span>}
+        </strong>
         <small>{description}</small>
       </span>
     </label>
@@ -103,44 +109,42 @@ export function RuleFields({
         onChange={(v) => onChange('penetration', v)}
       />
       <Checkbox
-        label="Double after split"
+        label="Double after split (DAS)"
+        frequency="Very common"
         checked={r.doubleAfterSplit}
         description="Allow doubling a two-card split hand."
         onChange={(v) => onChange('doubleAfterSplit', v)}
       />
       <Checkbox
-        label="Dealer hits soft 17"
+        label="Dealer hits soft 17 (H17)"
+        frequency="Fairly common"
         checked={r.hitSoft17}
         description="Dealer draws on a soft 17."
         onChange={(v) => onChange('hitSoft17', v)}
       />
       <Checkbox
-        label="Resplit Aces"
+        label="Resplit Aces (RSA)"
+        frequency="Uncommon"
         checked={r.resplitAces}
-        description="Split another pair of Aces (up to four hands)."
+        description="Split another pair of Aces. Each split Ace receives one card."
         onChange={(v) => onChange('resplitAces', v)}
       />
       <Checkbox
-        label="Allow surrender"
+        label="Late surrender (LS)"
+        frequency="Uncommon"
         checked={r.surrender}
         description="Late surrender: give up half the initial wager."
         onChange={(v) => onChange('surrender', v)}
       />
       <div className="setting-label select-setting">
         <label htmlFor="s-payout">Blackjack payout</label>
-        <select
+        <ClassicSelect
           id="s-payout"
+          label="Blackjack payout"
           value={r.payout}
-          onChange={(event) =>
-            onChange('payout', event.target.value as TableRules['payout'])
-          }
-        >
-          {(['3:2', '6:5', '1:1', '2:1'] as const).map((payout) => (
-            <option key={payout} value={payout}>
-              {payout}
-            </option>
-          ))}
-        </select>
+          options={['3:2', '6:5'] as const}
+          onChange={(payout) => onChange('payout', payout)}
+        />
       </div>
     </>
   );

@@ -27,7 +27,7 @@ for (const mode of ['FREE PLAY', 'BASIC STRATEGY', 'DEVIATIONS']) {
         await page.getByRole('radio', { name: 'Fab 4', exact: true }).check();
       else
         await page
-          .getByRole('checkbox', { name: 'Allow surrender' })
+          .getByRole('checkbox', { name: 'Late surrender (LS)' })
           .setChecked(width !== 640);
       await page.getByRole('button', { name: `START ${mode}` }).click();
       await expect(page.locator('.topbar')).toHaveCSS(

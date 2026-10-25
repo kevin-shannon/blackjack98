@@ -324,7 +324,7 @@ test('captures legacy and React screens for visual review when the original HTML
         .click();
       await capture('menu');
       await page.getByRole('button', { name: /^FREE PLAY / }).click();
-      await page.getByRole('heading', { name: 'SET UP YOUR TABLE' }).click();
+      await page.locator('.setup-topline .dialog-cap').click();
       await capture('setup');
       await page.getByRole('button', { name: 'START FREE PLAY' }).click();
       await capture('table');

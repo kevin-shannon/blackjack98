@@ -14,19 +14,19 @@ export function StrategyRuleFields({
   return (
     <>
       <Checkbox
-        label="Double after split"
+        label="Double after split (DAS)"
         checked={rules.doubleAfterSplit}
         onChange={(v) => onChange('doubleAfterSplit', v)}
         description="Use basic strategy for tables that allow doubling after a split."
       />
       <Checkbox
-        label="Dealer hits soft 17"
+        label="Dealer hits soft 17 (H17)"
         checked={rules.hitSoft17}
         onChange={(v) => onChange('hitSoft17', v)}
         description="Adjust the correct action for H17 rules."
       />
       <Checkbox
-        label="Allow surrender"
+        label="Late surrender (LS)"
         checked={rules.surrender}
         onChange={(v) => onChange('surrender', v)}
         description="Include late surrender among the available actions."

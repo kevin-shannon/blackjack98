@@ -51,7 +51,7 @@ export function parseSettings(value: unknown): Settings {
       hitSoft17: boolean(r.hitSoft17, DEFAULT_RULES.hitSoft17),
       resplitAces: boolean(r.resplitAces, DEFAULT_RULES.resplitAces),
       surrender: boolean(r.surrender, DEFAULT_RULES.surrender),
-      payout: ['3:2', '6:5', '1:1', '2:1'].includes(String(r.payout))
+      payout: ['3:2', '6:5'].includes(String(r.payout))
         ? (r.payout as Payout)
         : DEFAULT_RULES.payout,
     },

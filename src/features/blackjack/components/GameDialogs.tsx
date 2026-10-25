@@ -17,8 +17,6 @@ export function GameDialogs() {
       >
         <div className="setup-topline">
           <div className="dialog-cap">STEP 2 OF 2 · FREE PLAY</div>
-          <h2>SET UP YOUR TABLE</h2>
-          <p>Choose your rules and gameplay options, then start the session.</p>
         </div>
         <div className="setup-scroll">
           <fieldset className="win-group">
@@ -41,9 +39,9 @@ export function GameDialogs() {
           </fieldset>
         </div>
         <div className="modal-actions setup-actions">
-          <ActionButton onClick={game.backToMenu}>◀ BACK</ActionButton>
+          <ActionButton onClick={game.backToMenu}>BACK</ActionButton>
           <ActionButton className="primary" onClick={game.startFreePlay}>
-            START FREE PLAY ▶
+            START FREE PLAY
           </ActionButton>
         </div>
       </Dialog>
@@ -126,6 +124,11 @@ export function GameDialogs() {
           </li>
           <li>
             <b>Split:</b> play two same-value starting cards as separate hands.
+          </li>
+          <li>
+            <b>Split Aces:</b> one card per Ace, with no additional hits or
+            doubles. Resplit Aces (RSA) allows another A,A split, up to four
+            hands.
           </li>
           <li>
             <b>Insurance:</b> when the dealer shows an Ace, wager half of the

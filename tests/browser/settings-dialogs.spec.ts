@@ -1,5 +1,42 @@
 import { expect, test } from '@playwright/test';
 
+test('Free Play orders rules by frequency and preserves saved choices over the new defaults', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 850 });
+  await page.goto('/');
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
+  const rules = page.locator('.setup-modal .win-group').first();
+  const checkboxes = rules.getByRole('checkbox');
+  await expect(checkboxes).toHaveCount(4);
+  const names = await rules
+    .locator('.checkbox-copy strong')
+    .evaluateAll((elements) =>
+      elements.map((element) => element.firstChild!.textContent),
+    );
+  expect(names).toEqual([
+    'Double after split (DAS)',
+    'Dealer hits soft 17 (H17)',
+    'Resplit Aces (RSA)',
+    'Late surrender (LS)',
+  ]);
+  await expect(rules.locator('.rule-frequency')).toHaveText([
+    'Very common',
+    'Fairly common',
+    'Uncommon',
+    'Uncommon',
+  ]);
+  for (const [index, checked] of [true, true, false, false].entries())
+    await expect(checkboxes.nth(index)).toBeChecked({ checked });
+  await page.getByRole('checkbox', { name: 'Dealer hits soft 17' }).uncheck();
+  await page.getByRole('button', { name: 'START FREE PLAY' }).click();
+  await page.reload();
+  await page.getByRole('button', { name: /^FREE PLAY / }).click();
+  await expect(
+    page.getByRole('checkbox', { name: 'Dealer hits soft 17' }),
+  ).not.toBeChecked();
+});
+
 for (const mode of ['BASIC STRATEGY', 'DEVIATIONS', 'FREE PLAY']) {
   test(`${mode}: OK, Cancel, and Apply commit only pending settings`, async ({
     page,
@@ -67,14 +104,15 @@ for (const mode of ['BASIC STRATEGY', 'DEVIATIONS', 'FREE PLAY']) {
         ? dialog.getByRole('radio', { name: 'H17', exact: false })
         : dialog.getByRole('checkbox', { name: 'Dealer hits soft 17' });
     const beforeRules = await persisted();
-    await rule.check();
+    const initiallyChecked = await rule.isChecked();
+    await rule.setChecked(!initiallyChecked);
     expect(await persisted()).toBe(beforeRules);
     await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
     await page
       .getByRole('button', { name: 'Table Rules', exact: true })
       .click();
-    await expect(rule).not.toBeChecked();
-    await rule.check();
+    await expect(rule).toBeChecked({ checked: initiallyChecked });
+    await rule.setChecked(!initiallyChecked);
     await apply.click();
     await expect(dialog).toBeVisible();
     await expect(apply).toBeDisabled();
@@ -83,6 +121,6 @@ for (const mode of ['BASIC STRATEGY', 'DEVIATIONS', 'FREE PLAY']) {
     await page
       .getByRole('button', { name: 'Table Rules', exact: true })
       .click();
-    await expect(rule).toBeChecked();
+    await expect(rule).toBeChecked({ checked: !initiallyChecked });
   });
 }

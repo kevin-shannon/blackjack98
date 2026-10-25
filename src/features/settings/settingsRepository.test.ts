@@ -2,6 +2,46 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_OPTIONS, DEFAULT_RULES } from '../blackjack/model/constants';
 import { parseSettings } from './settingsRepository';
 describe('settings compatibility and validation', () => {
+  it('keeps supported payouts and defaults retired payouts to 3:2', () => {
+    for (const payout of ['3:2', '6:5'])
+      expect(parseSettings({ rules: { payout } }).rules.payout).toBe(payout);
+    for (const payout of ['1:1', '2:1'])
+      expect(parseSettings({ rules: { payout } }).rules.payout).toBe('3:2');
+  });
+  it('defaults Free Play to the common choices without overriding saved rules', () => {
+    expect(parseSettings(null).rules).toMatchObject({
+      doubleAfterSplit: true,
+      hitSoft17: true,
+      resplitAces: false,
+      surrender: false,
+    });
+    expect(
+      parseSettings({
+        rules: {
+          doubleAfterSplit: false,
+          hitSoft17: false,
+          resplitAces: true,
+          surrender: true,
+        },
+      }).rules,
+    ).toMatchObject({
+      doubleAfterSplit: false,
+      hitSoft17: false,
+      resplitAces: true,
+      surrender: true,
+    });
+  });
+  it('ignores retired HSA preferences while preserving RSA', () => {
+    for (const hitSplitAces of [false, true, 'true']) {
+      for (const resplitAces of [false, true]) {
+        const rules = parseSettings({
+          rules: { hitSplitAces, resplitAces },
+        }).rules;
+        expect(rules).not.toHaveProperty('hitSplitAces');
+        expect(rules.resplitAces).toBe(resplitAces);
+      }
+    }
+  });
   it('ignores retired automatic count-quiz preferences', () => {
     const options = parseSettings({
       options: { askCount: true, countInterval: 1 },

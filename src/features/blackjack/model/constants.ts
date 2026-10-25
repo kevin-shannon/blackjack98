@@ -36,7 +36,7 @@ export const DEFAULT_RULES: TableRules = {
   decks: 6,
   penetration: 75,
   doubleAfterSplit: true,
-  hitSoft17: false,
+  hitSoft17: true,
   resplitAces: false,
   surrender: false,
   payout: '3:2',
