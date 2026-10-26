@@ -42,11 +42,6 @@ export function StrategyDialogs() {
               />
             </div>
           </fieldset>
-          <div className="setting-hint">
-            Normal deals random hands. Difficult picks from the edge cases for
-            your table rules. Both continue indefinitely; accuracy is separate
-            from Free Play.
-          </div>
         </div>
         <div className="modal-actions setup-actions">
           <ActionButton onClick={trainer.backToMenu}>BACK</ActionButton>
@@ -65,12 +60,6 @@ export function StrategyDialogs() {
         onCancel={trainer.closePanel}
       >
         <h2>TABLE RULES</h2>
-        <div className="setting-hint">
-          Practice uses standard multi-deck basic strategy with dealer peek and
-          doubling on any two starting cards. Applying a table rule change
-          starts a new session, resetting accuracy, streaks, and all practice
-          counters.
-        </div>
         <div className="settings-form">
           <StrategyRuleFields
             rules={(draft || settings).rules}
@@ -89,12 +78,6 @@ export function StrategyDialogs() {
         onCancel={trainer.closePanel}
       >
         <h2>GAME OPTIONS</h2>
-        <div className="setting-hint">
-          Correct answers advance automatically. After a mistake or timeout,
-          review the explanation and choose Next hand. Enable Skip explanations
-          to advance automatically after every answer. Changing difficulty keeps
-          your accuracy.
-        </div>
         <div className="settings-form">
           <StrategyOptionFields
             options={(draft || settings).options}
@@ -106,14 +89,17 @@ export function StrategyDialogs() {
     );
   if (state.panel === 'reset')
     return (
-      <Dialog key="strategy-reset" title="Blackjack 98 — New Strategy Session">
+      <Dialog
+        key="strategy-reset"
+        title="Blackjack 98 — New Strategy Session"
+        className="reset-modal"
+        onCancel={trainer.closePanel}
+      >
         <h2>NEW SESSION?</h2>
         <p>Reset Basic Strategy accuracy and streaks and start a new hand.</p>
-        <div className="modal-actions">
-          <ActionButton onClick={trainer.closePanel}>CANCEL</ActionButton>
-          <ActionButton className="primary" onClick={trainer.start}>
-            RESET
-          </ActionButton>
+        <div className="modal-actions settings-actions">
+          <ActionButton onClick={trainer.start}>OK</ActionButton>
+          <ActionButton onClick={trainer.closePanel}>Cancel</ActionButton>
         </div>
       </Dialog>
     );
@@ -122,7 +108,7 @@ export function StrategyDialogs() {
       <Dialog
         key="strategy-help"
         title="Blackjack 98 — Basic Strategy Help"
-        className="settings-modal"
+        className="settings-modal help-modal"
         onCancel={trainer.closePanel}
       >
         <h2>HOW TO PRACTICE</h2>
@@ -142,10 +128,16 @@ export function StrategyDialogs() {
             skipped because there is no decision.
           </li>
           <li>
-            Difficult randomly picks hand/upcard combinations where a
-            neighboring total or upcard changes the correct action. Pairs
-            compare only dealer upcards. The pool follows your table rules, with
+            Tricky randomly picks hand/upcard combinations where a neighboring
+            player row or dealer upcard changes the correct action. Pairs also
+            compare adjacent pair ranks. The pool follows your table rules, with
             repeats allowed.
+          </li>
+          <li>
+            Hand type limits practice to Hard, Soft, or Pairs; All includes
+            every type. A,A and any two ten-valued cards count as pairs.
+            Applying a hand-type change deals a fresh question and keeps your
+            accuracy.
           </li>
           <li>
             DAS, H17, and late surrender change the strategy. No wagers,
@@ -160,10 +152,8 @@ export function StrategyDialogs() {
             Escape opens the menu.
           </li>
         </ul>
-        <div className="modal-actions">
-          <ActionButton className="primary wide" onClick={trainer.closePanel}>
-            OK
-          </ActionButton>
+        <div className="modal-actions settings-actions">
+          <ActionButton onClick={trainer.closePanel}>OK</ActionButton>
         </div>
       </Dialog>
     );

@@ -215,7 +215,7 @@ test('starts, adjusts wagers, completes rounds, and resets without browser error
     await finishRound(page);
   }
   await page.getByRole('button', { name: 'New Session', exact: true }).click();
-  await page.getByRole('button', { name: 'RESET', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.getByLabel('Current bankroll')).toContainText('$1,000');
   await expect(page.locator('.status')).toHaveText(
     'Choose your wager to begin.',
@@ -373,7 +373,7 @@ test('selects stakes presets, locks their sliders, and applies limits to the nex
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.getByLabel('Current bankroll')).toContainText('$1,000');
   await page.getByRole('button', { name: 'New Session', exact: true }).click();
-  await page.getByRole('button', { name: 'RESET', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.getByLabel('Current bankroll')).toContainText('$10,000');
   await expect(page.getByLabel('Bet amount')).toHaveText('$0');
   for (let i = 0; i < 10; i++)

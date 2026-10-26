@@ -90,17 +90,20 @@ export function GameDialogs() {
     );
   if (state.panel === 'reset')
     return (
-      <Dialog key="reset" title="Blackjack 98 — New Session">
+      <Dialog
+        key="reset"
+        title="Blackjack 98 — New Session"
+        className="reset-modal"
+        onCancel={game.closePanel}
+      >
         <h2>NEW SESSION?</h2>
         <p>
           Reset your bankroll, hands, running count, and win/loss record. Table
           rules and gameplay options stay saved.
         </p>
-        <div className="modal-actions">
-          <ActionButton onClick={game.closePanel}>CANCEL</ActionButton>
-          <ActionButton className="primary" onClick={game.resetSession}>
-            RESET
-          </ActionButton>
+        <div className="modal-actions settings-actions">
+          <ActionButton onClick={game.resetSession}>OK</ActionButton>
+          <ActionButton onClick={game.closePanel}>Cancel</ActionButton>
         </div>
       </Dialog>
     );
@@ -109,7 +112,7 @@ export function GameDialogs() {
       <Dialog
         key="help"
         title="Blackjack 98 — Help"
-        className="settings-modal"
+        className="settings-modal help-modal"
         onCancel={game.closePanel}
       >
         <h2>HOW TO PLAY</h2>
@@ -143,10 +146,8 @@ export function GameDialogs() {
             shuffle.
           </li>
         </ul>
-        <div className="modal-actions">
-          <ActionButton className="primary wide" onClick={game.closePanel}>
-            OK
-          </ActionButton>
+        <div className="modal-actions settings-actions">
+          <ActionButton onClick={game.closePanel}>OK</ActionButton>
         </div>
       </Dialog>
     );

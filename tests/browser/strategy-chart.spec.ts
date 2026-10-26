@@ -182,7 +182,7 @@ test('a timed-out hand can open the chart and remains in review until Next hand'
   await dialog.getByRole('button', { name: 'Close', exact: true }).click();
   await expect(page.getByLabel('Current round')).toHaveText('ROUND 01');
   await expect(page.locator('.strategy-session-stats')).toContainText(
-    'TIMEOUTS 1',
+    'CORRECT 0 / 1',
   );
   await page.getByRole('button', { name: 'Next hand', exact: true }).click();
   await expect(page.getByLabel('Current round')).toHaveText('ROUND 02');

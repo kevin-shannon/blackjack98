@@ -5,6 +5,7 @@ export const DEFAULT_STRATEGY_SETTINGS: StrategySettings = {
   rules: { doubleAfterSplit: true, hitSoft17: false, surrender: false },
   options: {
     difficulty: 'normal',
+    handType: 'all',
     skipExplanations: false,
     timedHands: false,
     seconds: 10,
@@ -32,6 +33,12 @@ export function parseStrategySettings(value: unknown): StrategySettings {
     options: {
       skipExplanations: bool(options.skipExplanations, false),
       difficulty: options.difficulty === 'difficult' ? 'difficult' : 'normal',
+      handType:
+        options.handType === 'hard' ||
+        options.handType === 'soft' ||
+        options.handType === 'pair'
+          ? options.handType
+          : 'all',
       timedHands: bool(options.timedHands, false),
       seconds:
         typeof options.seconds === 'number' && Number.isFinite(options.seconds)

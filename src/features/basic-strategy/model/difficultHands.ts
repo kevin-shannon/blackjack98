@@ -38,7 +38,7 @@ const pairRows: PlayerRow[] = DEALER_RANKS.map((rank) => ({
 }));
 const pools = new Map<string, readonly DifficultHand[]>();
 
-/** Both sides of each action boundary qualify. Pairs compare dealer upcards only.
+/** Both sides of each action boundary qualify, across dealer upcards and player rows.
  * See docs/basic-strategy-edge-cases.md for all eight rule-specific lists.
  */
 export function getDifficultHands(
@@ -64,8 +64,7 @@ export function getDifficultHands(
           actions[r][c - 1],
           actions[r][c + 1],
         ];
-        if (row.family !== 'pair')
-          neighbors.push(actions[r - 1]?.[c], actions[r + 1]?.[c]);
+        neighbors.push(actions[r - 1]?.[c], actions[r + 1]?.[c]);
         if (neighbors.some((action) => action && action !== actions[r][c]))
           pool.push({ ...row, dealerRank });
       });

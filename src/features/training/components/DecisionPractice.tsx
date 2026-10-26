@@ -129,12 +129,6 @@ export function DecisionPractice<
             <b>{state.stats.streak}</b>
             <span className="divider-dot">·</span> BEST{' '}
             <b>{state.stats.bestStreak}</b>
-            {state.stats.timeouts > 0 && (
-              <>
-                {' '}
-                · TIMEOUTS <b>{state.stats.timeouts}</b>
-              </>
-            )}
           </div>
         }
       >
@@ -228,16 +222,16 @@ export function DecisionPractice<
                     {context}
                     <p id={explanationId}>{state.feedback.explanation}</p>
                     <div className="practice-review-actions">
+                      {reviewActions}
                       <ActionButton
                         ref={nextHandRef}
-                        className="primary wide"
+                        className="primary"
                         onClick={trainer.nextHand}
                         aria-describedby={explanationId}
                         autoFocus
                       >
                         Next hand
                       </ActionButton>
-                      {reviewActions}
                     </div>
                   </aside>
                 )}

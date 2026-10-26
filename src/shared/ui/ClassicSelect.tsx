@@ -5,12 +5,14 @@ export function ClassicSelect<T extends string>({
   label,
   value,
   options,
+  getLabel = (option) => option,
   onChange,
 }: {
   id: string;
   label: string;
   value: T;
   options: readonly T[];
+  getLabel?: (value: T) => string;
   onChange: (value: T) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -108,7 +110,9 @@ export function ClassicSelect<T extends string>({
               )
                 break;
               const match = options.findIndex((option) =>
-                option.toLowerCase().startsWith(event.key.toLowerCase()),
+                getLabel(option)
+                  .toLowerCase()
+                  .startsWith(event.key.toLowerCase()),
               );
               if (match !== -1) {
                 event.preventDefault();
@@ -119,7 +123,7 @@ export function ClassicSelect<T extends string>({
           }
         }}
       >
-        <span className="classic-select-value">{value}</span>
+        <span className="classic-select-value">{getLabel(value)}</span>
         <span className="classic-select-arrow" aria-hidden="true" />
       </button>
       {open && (
@@ -140,7 +144,7 @@ export function ClassicSelect<T extends string>({
               onMouseMove={() => setActive(index)}
               onClick={() => choose(index)}
             >
-              {option}
+              {getLabel(option)}
             </div>
           ))}
         </div>

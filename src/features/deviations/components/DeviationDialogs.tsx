@@ -98,14 +98,16 @@ export function DeviationDialogs() {
     );
   if (state.panel === 'reset')
     return (
-      <Dialog title="Blackjack 98 — New Deviation Session">
+      <Dialog
+        title="Blackjack 98 — New Deviation Session"
+        className="reset-modal"
+        onCancel={trainer.closePanel}
+      >
         <h2>NEW SESSION?</h2>
         <p>Reset Deviations accuracy and streaks and start a new hand.</p>
-        <div className="modal-actions">
-          <ActionButton onClick={trainer.closePanel}>CANCEL</ActionButton>
-          <ActionButton className="primary" onClick={trainer.start}>
-            RESET
-          </ActionButton>
+        <div className="modal-actions settings-actions">
+          <ActionButton onClick={trainer.start}>OK</ActionButton>
+          <ActionButton onClick={trainer.closePanel}>Cancel</ActionButton>
         </div>
       </Dialog>
     );
@@ -113,7 +115,7 @@ export function DeviationDialogs() {
     return (
       <Dialog
         title="Blackjack 98 — Deviation Help"
-        className="settings-modal"
+        className="settings-modal help-modal"
         onCancel={trainer.closePanel}
       >
         <h2>HOW TO PRACTICE</h2>
@@ -164,10 +166,8 @@ export function DeviationDialogs() {
             H17 / S17 comparison
           </a>
         </div>
-        <div className="modal-actions bottom-actions">
-          <ActionButton className="primary wide" onClick={trainer.closePanel}>
-            OK
-          </ActionButton>
+        <div className="modal-actions settings-actions">
+          <ActionButton onClick={trainer.closePanel}>OK</ActionButton>
         </div>
       </Dialog>
     );

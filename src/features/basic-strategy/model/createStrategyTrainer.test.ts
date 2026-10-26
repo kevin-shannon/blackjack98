@@ -48,6 +48,53 @@ function practice(timed = false) {
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 describe('rapid-fire practice lifecycle', () => {
+  it('applies hand filters to fresh questions, preserves accuracy, and discards canceled changes', () => {
+    const save = vi.fn();
+    const trainer = createStrategyTrainer({
+      random: () => 0.4,
+      settings: {
+        load: () => structuredClone(DEFAULT_STRATEGY_SETTINGS),
+        save,
+      },
+    });
+    trainer.configure();
+    trainer.updateOption('handType', 'pair');
+    trainer.start();
+    const disconnect = trainer.connect();
+    const original = trainer.getSnapshot();
+    const question = original.state.question!;
+    expect(value(question.cards[0])).toBe(value(question.cards[1]));
+    trainer.answer(
+      recommendAction(question.cards, question.dealer, original.settings.rules),
+    );
+    trainer.openPanel('options');
+    trainer.updateOption('handType', 'hard');
+    trainer.closePanel();
+    expect(trainer.getSnapshot().settings.options.handType).toBe('pair');
+    expect(trainer.getSnapshot().state.question?.id).toBe(question.id);
+    trainer.openPanel('options');
+    trainer.updateOption('handType', 'hard');
+    trainer.applySettings();
+    let current = trainer.getSnapshot().state.question!;
+    expect(current.id).not.toBe(question.id);
+    expect(score(current.cards).soft).toBe(false);
+    expect(value(current.cards[0])).not.toBe(value(current.cards[1]));
+    trainer.updateOption('difficulty', 'difficult');
+    trainer.updateOption('handType', 'soft');
+    trainer.applySettings();
+    current = trainer.getSnapshot().state.question!;
+    expect(score(current.cards).soft).toBe(true);
+    expect(value(current.cards[0])).not.toBe(value(current.cards[1]));
+    expect(trainer.getSnapshot().state.stats).toMatchObject({
+      attempts: 1,
+      correct: 1,
+    });
+    expect(save.mock.lastCall?.[0].options).toMatchObject({
+      handType: 'soft',
+      difficulty: 'difficult',
+    });
+    disconnect();
+  });
   it('runs Difficult indefinitely, rebuilds the pool for rule changes, and can return to Normal', async () => {
     const save = vi.fn();
     const trainer = createStrategyTrainer({

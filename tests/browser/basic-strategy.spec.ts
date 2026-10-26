@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+async function chooseDifficulty(page: Page, choice: 'Normal' | 'Tricky') {
+  await page.getByRole('combobox', { name: 'Difficulty', exact: true }).click();
+  await page.getByRole('option', { name: choice, exact: true }).click();
+}
+
 async function configure(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: /^BASIC STRATEGY / }).click();
@@ -72,9 +77,9 @@ test('offers only relevant settings and persists them independently of Free Play
   await expect(page.getByLabel('Stakes', { exact: true })).toHaveCount(0);
   await expect(page.getByLabel('Blackjack payout')).toHaveCount(0);
   await expect(
-    page.getByRole('radio', { name: 'Normal', exact: false }),
-  ).toBeChecked();
-  await page.getByRole('radio', { name: 'Difficult', exact: false }).check();
+    page.getByRole('combobox', { name: 'Difficulty', exact: true }),
+  ).toHaveText('Normal');
+  await chooseDifficulty(page, 'Tricky');
   await page.getByRole('checkbox', { name: 'Dealer hits soft 17' }).uncheck();
   await page.getByRole('checkbox', { name: 'Late surrender (LS)' }).check();
   await page.getByRole('checkbox', { name: 'Double after split' }).uncheck();
@@ -102,34 +107,34 @@ test('offers only relevant settings and persists them independently of Free Play
     page.getByRole('checkbox', { name: 'Double after split' }),
   ).not.toBeChecked();
   await expect(
-    page.getByRole('radio', { name: 'Difficult', exact: false }),
-  ).toBeChecked();
+    page.getByRole('combobox', { name: 'Difficulty', exact: true }),
+  ).toHaveText('Tricky');
 });
 
-test('Difficult deals edge cases continuously and changing back to Normal retains accuracy', async ({
+test('Tricky deals edge cases continuously and changing back to Normal retains accuracy', async ({
   page,
 }, testInfo) => {
   await page.addInitScript(() => {
     Math.random = () => 0.4;
   });
   await configure(page);
-  await page.getByRole('radio', { name: 'Difficult', exact: false }).check();
+  await chooseDifficulty(page, 'Tricky');
   await page.screenshot({
     path: testInfo.outputPath('strategy-difficulty-setup.png'),
     fullPage: true,
   });
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
-  // The chosen edge cell is hard 16 vs 6; Normal's same RNG deals 6,6 vs 6.
-  await expect(page.locator('.strategy-hand .score-pill')).toHaveText('16');
-  const stand = page.getByRole('button', { name: 'Stand', exact: true });
-  await stand.click();
+  // The expanded pool selects soft 15 vs 7; Normal's same RNG deals 6,6 vs 6.
+  await expect(page.locator('.strategy-hand .score-pill')).toHaveText('15');
+  const hit = page.getByRole('button', { name: 'Hit', exact: true });
+  await hit.click();
   await expect(
-    page.getByRole('button', { name: 'Stand', exact: true }),
+    page.getByRole('button', { name: 'Hit', exact: true }),
   ).toHaveClass(/strategy-correct-action/);
-  await expect(stand).toBeEnabled();
-  await expect(page.locator('.strategy-hand .score-pill')).toHaveText('16');
+  await expect(hit).toBeEnabled();
+  await expect(page.locator('.strategy-hand .score-pill')).toHaveText('15');
   await page.getByRole('button', { name: 'Options', exact: true }).click();
-  await page.getByRole('radio', { name: 'Normal', exact: false }).check();
+  await chooseDifficulty(page, 'Normal');
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('.strategy-hand .score-pill')).toHaveText('12');
   await page.getByRole('button', { name: 'Split', exact: true }).click();
@@ -149,9 +154,9 @@ test('changing table rules mid-run resets Basic Strategy accuracy, streaks, and 
     Math.random = () => 0.4;
   });
   await configure(page);
-  await page.getByRole('radio', { name: 'Difficult', exact: false }).check();
+  await chooseDifficulty(page, 'Tricky');
   await page.getByRole('button', { name: 'START BASIC STRATEGY' }).click();
-  await page.getByRole('button', { name: 'Stand', exact: true }).click();
+  await page.getByRole('button', { name: 'Hit', exact: true }).click();
   await expect(page.getByLabel('Basic Strategy accuracy')).toContainText(
     '100.0%',
   );
@@ -178,8 +183,8 @@ test('changing table rules mid-run resets Basic Strategy accuracy, streaks, and 
   ).toBeEnabled();
   await page.getByRole('button', { name: 'Options', exact: true }).click();
   await expect(
-    page.getByRole('radio', { name: 'Difficult', exact: false }),
-  ).toBeChecked();
+    page.getByRole('combobox', { name: 'Difficulty', exact: true }),
+  ).toHaveText('Tricky');
 });
 
 test('keeps one resume button and starts fresh when switching between Free Play and Basic Strategy', async ({
@@ -255,7 +260,7 @@ test('timed questions pause in menus and score a timeout once before advancing',
   await page.clock.runFor(3000);
   await expect(page.locator('.strategy-correct-action')).toHaveCount(1);
   await expect(page.locator('.strategy-session-stats')).toContainText(
-    'TIMEOUTS 1',
+    'CORRECT 0 / 1',
   );
   await page.clock.runFor(1200);
   await expect(
@@ -275,14 +280,14 @@ test('fits a phone and supports keyboard answers', async ({
   });
   await configure(page);
   await expect(
-    page.getByRole('group', { name: 'Difficulty', exact: true }),
+    page.getByRole('combobox', { name: 'Difficulty', exact: true }),
   ).toBeInViewport();
-  await page.getByRole('radio', { name: 'Difficult', exact: false }).check();
+  await chooseDifficulty(page, 'Tricky');
   await page.screenshot({
     path: testInfo.outputPath('strategy-difficulty-mobile.png'),
     fullPage: true,
   });
-  await page.getByRole('radio', { name: 'Normal', exact: false }).check();
+  await chooseDifficulty(page, 'Normal');
   await expect(
     page.getByRole('button', { name: 'START BASIC STRATEGY' }),
   ).toBeInViewport();

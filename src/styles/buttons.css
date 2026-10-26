@@ -72,8 +72,7 @@
   .action-btn.safe,
   .action-btn.danger,
   .settings-actions .action-btn,
-  .menu-utilities .action-btn,
-  .practice-review .action-btn {
+  .menu-utilities .action-btn {
     height: 44px;
   }
 }

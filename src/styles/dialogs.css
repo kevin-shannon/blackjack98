@@ -1,6 +1,11 @@
 .modal {
   padding-top: 38px;
 }
+.reset-modal,
+.help-modal {
+  padding-inline: 12px;
+  padding-bottom: 12px;
+}
 .modal::before,
 .practice-review-title {
   height: 24px;

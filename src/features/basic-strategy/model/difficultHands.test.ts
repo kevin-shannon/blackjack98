@@ -6,14 +6,14 @@ import type { StrategyRules } from './types';
 
 // Counts independently calculated in the agreed eight-table design analysis.
 const configurations = [
-  [false, false, false, 55, 38, 21],
-  [false, false, true, 59, 38, 21],
-  [false, true, false, 55, 38, 19],
-  [false, true, true, 59, 38, 19],
-  [true, false, false, 57, 41, 21],
-  [true, false, true, 62, 41, 23],
-  [true, true, false, 57, 41, 19],
-  [true, true, true, 62, 41, 21],
+  [false, false, false, 55, 38, 76],
+  [false, false, true, 59, 38, 76],
+  [false, true, false, 55, 38, 72],
+  [false, true, true, 59, 38, 72],
+  [true, false, false, 57, 41, 76],
+  [true, false, true, 62, 41, 76],
+  [true, true, false, 57, 41, 72],
+  [true, true, true, 62, 41, 72],
 ] as const;
 
 describe.each(configurations)(
@@ -27,7 +27,10 @@ describe.each(configurations)(
       expect(pool.filter((hand) => hand.family === 'pair')).toHaveLength(pair);
       expect(
         new Set(
-          pool.map((hand) => `${hand.family}/${hand.total}/${hand.dealerRank}`),
+          pool.map(
+            (hand) =>
+              `${hand.family}/${hand.compositions[0].join(',')}/${hand.dealerRank}`,
+          ),
         ).size,
       ).toBe(pool.length);
     });
@@ -65,17 +68,27 @@ describe.each(configurations)(
         ).toBe(3);
       });
     });
-    it('excludes pairs of aces and tens because pair rows only compare dealer upcards', () => {
+    it('includes player-row boundaries for pairs without adding non-boundary cells', () => {
       const pairs = getDifficultHands(rules).filter(
         (hand) => hand.family === 'pair',
       );
-      expect(
-        pairs.some((hand) => ['A', '10'].includes(hand.compositions[0][0])),
-      ).toBe(false);
-      const eights = pairs.filter((hand) => hand.compositions[0][0] === '8');
-      expect(eights.map((hand) => hand.dealerRank)).toEqual(
-        hitSoft17 && surrender ? ['10', 'A'] : [],
-      );
+      const contains = (rank: string, dealerRank: string) =>
+        pairs.some(
+          (hand) =>
+            hand.compositions[0][0] === rank && hand.dealerRank === dealerRank,
+        );
+      // These adjacent rows disagree for every upcard: tens stand, Aces split.
+      for (const rank of ['A', '10'])
+        expect(
+          pairs.filter((hand) => hand.compositions[0][0] === rank),
+        ).toHaveLength(10);
+      // 4,4 and 5,5 have a vertical action boundary against dealer 4.
+      expect(contains('4', '4')).toBe(true);
+      expect(contains('5', '4')).toBe(true);
+      // At 2,2 vs 2, all existing neighbors prescribe the same action.
+      expect(contains('2', '2')).toBe(false);
+      // 3,3 vs 2 borders 4,4's Hit only when DAS enables splitting 3,3.
+      expect(contains('3', '2')).toBe(doubleAfterSplit);
     });
   },
 );

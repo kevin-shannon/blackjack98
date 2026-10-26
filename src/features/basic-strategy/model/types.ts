@@ -7,9 +7,11 @@ export interface StrategyRules {
   surrender: boolean;
 }
 export type StrategyDifficulty = 'normal' | 'difficult';
+export type StrategyHandType = 'hard' | 'soft' | 'pair' | 'all';
 export interface StrategyOptions {
   skipExplanations: boolean;
   difficulty: StrategyDifficulty;
+  handType: StrategyHandType;
   timedHands: boolean;
   seconds: number;
 }

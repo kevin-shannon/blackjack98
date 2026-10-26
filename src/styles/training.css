@@ -52,10 +52,6 @@
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-.practice-review .action-btn {
-  width: 100%;
-  height: 38px;
-}
 .practice-review .deviation-context {
   color: #333;
   text-align: left;

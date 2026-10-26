@@ -28,8 +28,13 @@ export function createStrategyTrainer(
       parseSettings: parseStrategySettings,
       dealQuestion: (random, id, settings) =>
         settings.options.difficulty === 'difficult'
-          ? dealDifficultQuestion(random, id, settings.rules)
-          : dealQuestion(random, id),
+          ? dealDifficultQuestion(
+              random,
+              id,
+              settings.rules,
+              settings.options.handType,
+            )
+          : dealQuestion(random, id, settings.options.handType),
       recommendAction: (question, rules) =>
         recommendAction(question.cards, question.dealer, rules),
       explainDecision: (question, rules) =>
@@ -40,7 +45,8 @@ export function createStrategyTrainer(
           : action === 'split'
             ? value(question.cards[0]) === value(question.cards[1])
             : true,
-      optionChange: (key) => (key === 'difficulty' ? 'replace' : 'timer'),
+      optionChange: (key) =>
+        key === 'difficulty' || key === 'handType' ? 'replace' : 'timer',
     },
     dependencies,
   );

@@ -232,7 +232,7 @@ test('fits a phone, pauses timed questions in menus, and counts a timeout once',
     page.getByRole('region', { name: 'Explanation', exact: true }),
   ).toContainText('Time expired');
   await expect(page.locator('.strategy-session-stats')).toContainText(
-    'TIMEOUTS 1',
+    'CORRECT 0 / 1',
   );
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),

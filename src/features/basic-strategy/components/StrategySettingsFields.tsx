@@ -1,4 +1,5 @@
 import { Checkbox, Slider } from '../../settings/SettingsFields';
+import { ClassicSelect } from '../../../shared/ui/ClassicSelect';
 import type { StrategyOptions, StrategyRules } from '../model/types';
 
 export function StrategyRuleFields({
@@ -46,38 +47,30 @@ export function StrategyOptionFields({
 }) {
   return (
     <>
-      <fieldset className="strategy-difficulty">
-        <legend>Difficulty</legend>
-        <div className="strategy-difficulty-options">
-          {(
-            [
-              ['normal', 'Normal', 'Random hands from an infinite deck.'],
-              [
-                'difficult',
-                'Difficult',
-                'Practice hands at basic strategy boundaries.',
-              ],
-            ] as const
-          ).map(([value, label, description]) => (
-            <label
-              className="stakes-radio strategy-difficulty-choice"
-              key={value}
-            >
-              <input
-                type="radio"
-                name="strategy-difficulty"
-                value={value}
-                checked={options.difficulty === value}
-                onChange={() => onChange('difficulty', value)}
-              />
-              <span>
-                <strong>{label}</strong>
-                <small>{description}</small>
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <div className="setting-label select-setting">
+        <label htmlFor="strategy-difficulty">Difficulty</label>
+        <ClassicSelect
+          id="strategy-difficulty"
+          label="Difficulty"
+          value={options.difficulty}
+          options={['normal', 'difficult'] as const}
+          getLabel={(value) => (value === 'normal' ? 'Normal' : 'Tricky')}
+          onChange={(value) => onChange('difficulty', value)}
+        />
+      </div>
+      <div className="setting-label select-setting">
+        <label htmlFor="strategy-hand-type">Hand type</label>
+        <ClassicSelect
+          id="strategy-hand-type"
+          label="Hand type"
+          value={options.handType}
+          options={['hard', 'soft', 'pair', 'all'] as const}
+          getLabel={(value) =>
+            ({ hard: 'Hard', soft: 'Soft', pair: 'Pairs', all: 'All' })[value]
+          }
+          onChange={(value) => onChange('handType', value)}
+        />
+      </div>
       <Checkbox
         label="Skip explanations"
         checked={options.skipExplanations}
