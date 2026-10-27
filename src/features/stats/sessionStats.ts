@@ -19,10 +19,14 @@ export interface PracticeStats<Mode extends string = string> {
 }
 export type BasicStrategyStats = PracticeStats<'basic-strategy'>;
 export type DeviationsStats = PracticeStats<'deviations'>;
+export interface RunningCountStats extends PracticeStats<'running-count'> {
+  accuracyPoints: number;
+}
 export interface StatsByMode {
   'free-play': FreePlayStats;
   'basic-strategy': BasicStrategyStats;
   deviations: DeviationsStats;
+  'running-count': RunningCountStats;
 }
 export const createFreePlayStats = (): FreePlayStats => ({
   modeId: 'free-play',

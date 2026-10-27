@@ -1,0 +1,140 @@
+.counting-intro p {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.count-center {
+  position: relative;
+  min-height: 190px;
+  flex: 1;
+}
+.count-play-message {
+  color: #fff2b7;
+  font-size: 12px;
+  text-align: center;
+}
+.count-check {
+  z-index: 4;
+  width: min(340px, 100%);
+  text-shadow: none;
+}
+.count-check label {
+  font-size: 12px;
+}
+.count-check .count-answer-hint {
+  margin: 6px 0 0;
+  color: #444;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.count-drill-felt {
+  min-height: 500px;
+}
+.count-drill-felt .table-bottomline {
+  justify-content: flex-end;
+}
+.count-drill-layout {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+  padding: 22px 0;
+}
+.count-drill-check {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+}
+.deck-estimation-discard {
+  width: min(240px, 100%);
+  margin: 0;
+}
+.deck-estimation-discard figcaption {
+  color: #fff2b7;
+  font-size: 12px;
+  text-align: center;
+}
+.deck-estimation-discard svg {
+  display: block;
+  width: 100%;
+}
+.count-givens {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+}
+.count-givens > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.count-givens .score-pill {
+  min-width: 96px;
+  padding: 6px 12px;
+  font-size: 24px;
+  text-align: center;
+}
+.count-answer-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+.count-answer-row input {
+  width: 90px;
+  min-width: 0;
+  height: 28px;
+  border: 2px solid;
+  border-color: #808080 #fff #fff #808080;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: inset 1px 1px #000;
+  padding: 2px 6px;
+  color: #000;
+  font-size: 14px;
+}
+.count-answer-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.count-answer-result img {
+  image-rendering: pixelated;
+}
+.count-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 0;
+  margin-top: 9px;
+  padding: 8px 12px;
+  font-size: 11px;
+}
+.count-controls .action-btn {
+  flex: 0 0 76px;
+  height: 28px;
+}
+.count-felt .table-bottomline {
+  margin-top: 10px;
+}
+@media (max-width: 570px) {
+  .count-felt .shoe-track {
+    width: 128px;
+    flex-basis: 128px;
+  }
+}
+@media (max-width: 385px) {
+  .count-felt .shoe-track {
+    width: 100px;
+    flex-basis: 100px;
+  }
+}

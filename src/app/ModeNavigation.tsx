@@ -13,11 +13,14 @@ import { createStrategyTrainer } from '../features/basic-strategy/model/createSt
 import type { StrategyTrainer } from '../features/basic-strategy/model/createStrategyTrainer';
 import { createDeviationTrainer } from '../features/deviations/model/createDeviationTrainer';
 import type { DeviationTrainer } from '../features/deviations/model/createDeviationTrainer';
+import { createRunningCountTrainer } from '../features/running-count/model/createRunningCountTrainer';
+import type { RunningCountTrainer } from '../features/running-count/model/createRunningCountTrainer';
 
 interface Navigation {
   activeMode: TrainingModeId;
   trainer: StrategyTrainer;
   deviationTrainer: DeviationTrainer;
+  countTrainer: RunningCountTrainer;
   selectMode: (mode: TrainingModeId) => void;
   resumeGame: () => void;
   canResume: () => boolean;
@@ -28,36 +31,43 @@ export function ModeNavigationProvider({ children }: { children: ReactNode }) {
   const { game } = useBlackjack();
   const [trainer] = useState(() => createStrategyTrainer());
   const [deviationTrainer] = useState(() => createDeviationTrainer());
+  const [countTrainer] = useState(() => createRunningCountTrainer());
   const [activeMode, setActiveMode] = useState<TrainingModeId>('free-play');
   useEffect(() => trainer.connect(), [trainer]);
   useEffect(() => deviationTrainer.connect(), [deviationTrainer]);
+  useEffect(() => countTrainer.connect(), [countTrainer]);
   const selectMode = useCallback(
     (mode: TrainingModeId) => {
       if (mode !== activeMode) {
         if (activeMode === 'free-play') game.discardSession();
         else if (activeMode === 'basic-strategy') trainer.discardSession();
+        else if (activeMode === 'running-count') countTrainer.discardSession();
         else deviationTrainer.discardSession();
       }
       game.openPanel('menu');
       trainer.suspend();
       deviationTrainer.suspend();
+      countTrainer.suspend();
       if (mode === 'free-play') game.configureFreePlay();
       else if (mode === 'basic-strategy') trainer.configure();
+      else if (mode === 'running-count') countTrainer.configure();
       else deviationTrainer.configure();
       setActiveMode(mode);
     },
-    [activeMode, game, trainer, deviationTrainer],
+    [activeMode, game, trainer, deviationTrainer, countTrainer],
   );
   const resumeGame = useCallback(() => {
     if (activeMode === 'free-play') game.closePanel();
     else if (activeMode === 'basic-strategy') trainer.activate();
+    else if (activeMode === 'running-count') countTrainer.activate();
     else deviationTrainer.activate();
-  }, [activeMode, game, trainer, deviationTrainer]);
+  }, [activeMode, game, trainer, deviationTrainer, countTrainer]);
   const value = useMemo(
     () => ({
       activeMode,
       trainer,
       deviationTrainer,
+      countTrainer,
       selectMode,
       resumeGame,
       canResume: () =>
@@ -65,9 +75,19 @@ export function ModeNavigationProvider({ children }: { children: ReactNode }) {
           ? game.getSnapshot().state.modeStarted
           : activeMode === 'basic-strategy'
             ? trainer.getSnapshot().state.started
-            : deviationTrainer.getSnapshot().state.started,
+            : activeMode === 'running-count'
+              ? countTrainer.getSnapshot().state.started
+              : deviationTrainer.getSnapshot().state.started,
     }),
-    [activeMode, trainer, deviationTrainer, selectMode, resumeGame, game],
+    [
+      activeMode,
+      trainer,
+      deviationTrainer,
+      countTrainer,
+      selectMode,
+      resumeGame,
+      game,
+    ],
   );
   return (
     <NavigationContext.Provider value={value}>

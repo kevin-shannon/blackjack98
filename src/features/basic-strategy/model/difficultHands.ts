@@ -37,8 +37,13 @@ const pairRows: PlayerRow[] = DEALER_RANKS.map((rank) => ({
   compositions: [[rank, rank]],
 }));
 const pools = new Map<string, readonly DifficultHand[]>();
+const isRoutineRow = (row: PlayerRow) =>
+  (row.family === 'hard' && [8, 11, 17].includes(row.total)) ||
+  (row.family === 'pair' &&
+    ['5', '8', '10', 'A'].includes(row.compositions[0][0]));
 
 /** Both sides of each action boundary qualify, across dealer upcards and player rows.
+ * Routine rows retain dealer-upcard boundaries and one eligible example per action.
  * See docs/basic-strategy-edge-cases.md for all eight rule-specific lists.
  */
 export function getDifficultHands(
@@ -59,15 +64,40 @@ export function getDifficultHands(
       ),
     );
     rows.forEach((row, r) => {
-      DEALER_RANKS.forEach((dealerRank, c) => {
+      const eligible: number[] = [];
+      const dealerBoundaries = new Set<number>();
+      DEALER_RANKS.forEach((_, c) => {
         const neighbors: (PlayerAction | undefined)[] = [
           actions[r][c - 1],
           actions[r][c + 1],
         ];
         neighbors.push(actions[r - 1]?.[c], actions[r + 1]?.[c]);
         if (neighbors.some((action) => action && action !== actions[r][c]))
-          pool.push({ ...row, dealerRank });
+          eligible.push(c);
+        if (
+          neighbors
+            .slice(0, 2)
+            .some((action) => action && action !== actions[r][c])
+        )
+          dealerBoundaries.add(c);
       });
+      let retained = eligible;
+      if (isRoutineRow(row)) {
+        const keep = new Set(dealerBoundaries);
+        for (const action of new Set(eligible.map((c) => actions[r][c]))) {
+          // Prefer dealer 6 for the representative, using only existing edge cells.
+          const candidates = eligible.filter((c) => actions[r][c] === action);
+          keep.add(
+            candidates.reduce((best, c) =>
+              Math.abs(c - 4) < Math.abs(best - 4) ? c : best,
+            ),
+          );
+        }
+        retained = eligible.filter((c) => keep.has(c));
+      }
+      retained.forEach((c) =>
+        pool.push({ ...row, dealerRank: DEALER_RANKS[c] }),
+      );
     });
   }
   pools.set(key, pool);

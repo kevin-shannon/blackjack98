@@ -3,6 +3,7 @@ import { FreePlay } from '../features/blackjack/FreePlay';
 import { ModeNavigationProvider, useModeNavigation } from './ModeNavigation';
 import { BasicStrategy } from '../features/basic-strategy/BasicStrategy';
 import { Deviations } from '../features/deviations/Deviations';
+import { RunningCount } from '../features/running-count/RunningCount';
 export function App() {
   return (
     <BlackjackProvider>
@@ -20,5 +21,7 @@ function ModeScreen() {
       return <BasicStrategy />;
     case 'deviations':
       return <Deviations />;
+    case 'running-count':
+      return <RunningCount />;
   }
 }

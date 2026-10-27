@@ -7,6 +7,12 @@ export const trainingModes = [
     category: 'train',
   },
   {
+    id: 'running-count',
+    title: 'COUNTING',
+    description: 'Practice running count, deck estimation, and true count',
+    category: 'train',
+  },
+  {
     id: 'deviations',
     title: 'DEVIATIONS',
     description: 'Learn when to bend the rules',

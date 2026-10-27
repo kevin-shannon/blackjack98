@@ -13,45 +13,47 @@ Calculated from `src/features/basic-strategy/model/strategy.ts`, using the exist
 - There are no diagonal comparisons. Cells on both sides of an action change qualify.
 - Pair rows follow 2,2 through 10,10, then A,A. Compare adjacent pair ranks as well as adjacent dealer upcards; do not wrap A,A back to 2,2.
 
+Routine rows are thinned after the boundary check: hard 8, 11, and 17, plus pairs of Aces, 8s, 5s, and tens. Each retains every dealer-upcard action boundary and one eligible representative per correct action, preferring the upcard closest to 6 (lower upcard breaks ties). This keeps rule-specific exceptions while reducing repetitive decisions. Other rows keep all eligible cells.
+
 ## Counts by complete table-rule selection
 
 | Dealer rule | DAS | Late surrender | Hard totals | Soft totals | Pairs | Total |
 | ----------- | --- | -------------- | ----------: | ----------: | ----: | ----: |
-| S17         | Off | Off            |          55 |          38 |    76 |   169 |
-| S17         | Off | On             |          59 |          38 |    76 |   173 |
-| S17         | On  | Off            |          55 |          38 |    72 |   165 |
-| S17         | On  | On             |          59 |          38 |    72 |   169 |
-| H17         | Off | Off            |          57 |          41 |    76 |   174 |
-| H17         | Off | On             |          62 |          41 |    76 |   179 |
-| H17         | On  | Off            |          57 |          41 |    72 |   170 |
-| H17         | On  | On             |          62 |          41 |    72 |   175 |
+| S17         | Off | Off            |          41 |          38 |    48 |   127 |
+| S17         | Off | On             |          45 |          38 |    48 |   131 |
+| S17         | On  | Off            |          41 |          38 |    44 |   123 |
+| S17         | On  | On             |          45 |          38 |    44 |   127 |
+| H17         | Off | Off            |          41 |          41 |    48 |   130 |
+| H17         | Off | On             |          48 |          41 |    50 |   139 |
+| H17         | On  | Off            |          41 |          41 |    44 |   126 |
+| H17         | On  | On             |          48 |          41 |    46 |   135 |
 
-Numbers count chart cells, not the number of physical card combinations.
+Numbers count retained chart cells, not physical card combinations.
 
 ## Complete lists for each rule selection
 
-Each row lists the dealer upcards that make that player hand an edge case, grouped by the correct action. "All" means 2 through Ace. Hard totals exclude pairs: for example, hard 16 does not mean 8,8. A 10-valued upcard includes 10/J/Q/K.
+Each row lists retained dealer upcards, grouped by the correct action. Hard totals exclude pairs. A 10-valued upcard includes 10/J/Q/K.
 
 ### S17 / No DAS / No surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action |
+| Player hand | Retained dealer upcards, grouped by correct action |
 | ----------- | -------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                |
+| 8           | **hit**: 6                                         |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6        |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10                |
-| 11          | **double**: 2, 3, 4, 5, 6, 7, 8, 9, 10; **hit**: A |
+| 11          | **double**: 6, 10; **hit**: A                      |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10; **stand**: 4, 5, 6     |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                     |
 | 14          | **stand**: 6; **hit**: 7                           |
 | 15          | **stand**: 6; **hit**: 7                           |
 | 16          | **stand**: 6; **hit**: 7, 8, 9, 10, A              |
-| 17          | **stand**: 7, 8, 9, 10, A                          |
+| 17          | **stand**: 7                                       |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -63,39 +65,39 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **hit**: 3, 8; **split**: 4, 7                      |
 | 3,3         | **hit**: 3, 8; **split**: 4, 5, 6, 7                |
 | 4,4         | **hit**: 2, 3, 4, 5, 6, 7, 8, 9                     |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **hit**: 2, 7, 8, 9; **split**: 3, 4, 5, 6          |
 | 7,7         | **split**: 2, 7; **hit**: 8, 9, 10, A               |
-| 8,8         | **split**: 7, 8, 9, 10, A                           |
+| 8,8         | **split**: 7                                        |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ### S17 / No DAS / Surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action   |
+| Player hand | Retained dealer upcards, grouped by correct action   |
 | ----------- | ---------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                  |
+| 8           | **hit**: 6                                           |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6          |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10                  |
-| 11          | **double**: 2, 3, 4, 5, 6, 7, 8, 9, 10; **hit**: A   |
+| 11          | **double**: 6, 10; **hit**: A                        |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10; **stand**: 4, 5, 6       |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                       |
 | 14          | **stand**: 6; **hit**: 7, 10                         |
 | 15          | **stand**: 6; **hit**: 7, 9, A; **surrender**: 10    |
 | 16          | **stand**: 6; **hit**: 7, 8; **surrender**: 9, 10, A |
-| 17          | **stand**: 7, 8, 9, 10, A                            |
+| 17          | **stand**: 7                                         |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -107,39 +109,39 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **hit**: 3, 8; **split**: 4, 7                      |
 | 3,3         | **hit**: 3, 8; **split**: 4, 5, 6, 7                |
 | 4,4         | **hit**: 2, 3, 4, 5, 6, 7, 8, 9                     |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **hit**: 2, 7, 8, 9; **split**: 3, 4, 5, 6          |
 | 7,7         | **split**: 2, 7; **hit**: 8, 9, 10, A               |
-| 8,8         | **split**: 7, 8, 9, 10, A                           |
+| 8,8         | **split**: 7                                        |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ### S17 / DAS / No surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action |
+| Player hand | Retained dealer upcards, grouped by correct action |
 | ----------- | -------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                |
+| 8           | **hit**: 6                                         |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6        |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10                |
-| 11          | **double**: 2, 3, 4, 5, 6, 7, 8, 9, 10; **hit**: A |
+| 11          | **double**: 6, 10; **hit**: A                      |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10; **stand**: 4, 5, 6     |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                     |
 | 14          | **stand**: 6; **hit**: 7                           |
 | 15          | **stand**: 6; **hit**: 7                           |
 | 16          | **stand**: 6; **hit**: 7, 8, 9, 10, A              |
-| 17          | **stand**: 7, 8, 9, 10, A                          |
+| 17          | **stand**: 7                                       |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -151,39 +153,39 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **split**: 7; **hit**: 8                            |
 | 3,3         | **split**: 2, 3, 4, 7; **hit**: 8                   |
 | 4,4         | **hit**: 2, 3, 4, 7, 8, 9; **split**: 5, 6          |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **split**: 2, 3, 4, 5, 6; **hit**: 7, 8, 9          |
 | 7,7         | **split**: 7; **hit**: 8, 9, 10, A                  |
-| 8,8         | **split**: 7, 8, 9, 10, A                           |
+| 8,8         | **split**: 7                                        |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ### S17 / DAS / Surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action   |
+| Player hand | Retained dealer upcards, grouped by correct action   |
 | ----------- | ---------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                  |
+| 8           | **hit**: 6                                           |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6          |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10                  |
-| 11          | **double**: 2, 3, 4, 5, 6, 7, 8, 9, 10; **hit**: A   |
+| 11          | **double**: 6, 10; **hit**: A                        |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10; **stand**: 4, 5, 6       |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                       |
 | 14          | **stand**: 6; **hit**: 7, 10                         |
 | 15          | **stand**: 6; **hit**: 7, 9, A; **surrender**: 10    |
 | 16          | **stand**: 6; **hit**: 7, 8; **surrender**: 9, 10, A |
-| 17          | **stand**: 7, 8, 9, 10, A                            |
+| 17          | **stand**: 7                                         |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -195,39 +197,39 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **split**: 7; **hit**: 8                            |
 | 3,3         | **split**: 2, 3, 4, 7; **hit**: 8                   |
 | 4,4         | **hit**: 2, 3, 4, 7, 8, 9; **split**: 5, 6          |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **split**: 2, 3, 4, 5, 6; **hit**: 7, 8, 9          |
 | 7,7         | **split**: 7; **hit**: 8, 9, 10, A                  |
-| 8,8         | **split**: 7, 8, 9, 10, A                           |
+| 8,8         | **split**: 7                                        |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ### H17 / No DAS / No surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action |
+| Player hand | Retained dealer upcards, grouped by correct action |
 | ----------- | -------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                |
+| 8           | **hit**: 6                                         |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6        |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10, A             |
-| 11          | **double**: All (2-A)                              |
+| 11          | **double**: 6                                      |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10, A; **stand**: 4, 5, 6  |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                     |
 | 14          | **stand**: 6; **hit**: 7                           |
 | 15          | **stand**: 6; **hit**: 7                           |
 | 16          | **stand**: 6; **hit**: 7, 8, 9, 10, A              |
-| 17          | **stand**: 7, 8, 9, 10, A                          |
+| 17          | **stand**: 7                                       |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -240,40 +242,40 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **hit**: 3, 8; **split**: 4, 7                      |
 | 3,3         | **hit**: 3, 8; **split**: 4, 5, 6, 7                |
 | 4,4         | **hit**: 2, 3, 4, 5, 6, 7, 8, 9                     |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **hit**: 2, 7, 8, 9; **split**: 3, 4, 5, 6          |
 | 7,7         | **split**: 2, 7; **hit**: 8, 9, 10, A               |
-| 8,8         | **split**: 7, 8, 9, 10, A                           |
+| 8,8         | **split**: 7                                        |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ### H17 / No DAS / Surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action |
+| Player hand | Retained dealer upcards, grouped by correct action |
 | ----------- | -------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                |
+| 8           | **hit**: 6                                         |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6        |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10, A             |
-| 11          | **double**: All (2-A)                              |
+| 11          | **double**: 6                                      |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10, A; **stand**: 4, 5, 6  |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                     |
 | 14          | **stand**: 6; **hit**: 7, 10, A                    |
 | 15          | **stand**: 6; **hit**: 7, 9; **surrender**: 10, A  |
 | 16          | **stand**: 6; **hit**: 7, 8; **surrender**: 9, 10  |
-| 17          | **stand**: 7, 8, 9, 10; **surrender**: A           |
+| 17          | **stand**: 7, 10; **surrender**: A                 |
 | 18          | **stand**: A                                       |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -286,39 +288,39 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **hit**: 3, 8; **split**: 4, 7                      |
 | 3,3         | **hit**: 3, 8; **split**: 4, 5, 6, 7                |
 | 4,4         | **hit**: 2, 3, 4, 5, 6, 7, 8, 9                     |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **hit**: 2, 7, 8, 9; **split**: 3, 4, 5, 6          |
 | 7,7         | **split**: 2, 7; **hit**: 8, 9, 10, A               |
-| 8,8         | **split**: 7, 8, 9, 10; **surrender**: A            |
+| 8,8         | **split**: 7, 10; **surrender**: A                  |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ### H17 / DAS / No surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action |
+| Player hand | Retained dealer upcards, grouped by correct action |
 | ----------- | -------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                |
+| 8           | **hit**: 6                                         |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6        |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10, A             |
-| 11          | **double**: All (2-A)                              |
+| 11          | **double**: 6                                      |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10, A; **stand**: 4, 5, 6  |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                     |
 | 14          | **stand**: 6; **hit**: 7                           |
 | 15          | **stand**: 6; **hit**: 7                           |
 | 16          | **stand**: 6; **hit**: 7, 8, 9, 10, A              |
-| 17          | **stand**: 7, 8, 9, 10, A                          |
+| 17          | **stand**: 7                                       |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -331,40 +333,40 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **split**: 7; **hit**: 8                            |
 | 3,3         | **split**: 2, 3, 4, 7; **hit**: 8                   |
 | 4,4         | **hit**: 2, 3, 4, 7, 8, 9; **split**: 5, 6          |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **split**: 2, 3, 4, 5, 6; **hit**: 7, 8, 9          |
 | 7,7         | **split**: 7; **hit**: 8, 9, 10, A                  |
-| 8,8         | **split**: 7, 8, 9, 10, A                           |
+| 8,8         | **split**: 7                                        |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ### H17 / DAS / Surrender
 
 **Hard totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action |
+| Player hand | Retained dealer upcards, grouped by correct action |
 | ----------- | -------------------------------------------------- |
-| 8           | **hit**: 3, 4, 5, 6                                |
+| 8           | **hit**: 6                                         |
 | 9           | **hit**: 2, 7, 8, 9; **double**: 3, 4, 5, 6        |
 | 10          | **double**: 2, 7, 8, 9; **hit**: 10, A             |
-| 11          | **double**: All (2-A)                              |
+| 11          | **double**: 6                                      |
 | 12          | **hit**: 2, 3, 7, 8, 9, 10, A; **stand**: 4, 5, 6  |
 | 13          | **stand**: 2, 3, 6; **hit**: 7                     |
 | 14          | **stand**: 6; **hit**: 7, 10, A                    |
 | 15          | **stand**: 6; **hit**: 7, 9; **surrender**: 10, A  |
 | 16          | **stand**: 6; **hit**: 7, 8; **surrender**: 9, 10  |
-| 17          | **stand**: 7, 8, 9, 10; **surrender**: A           |
+| 17          | **stand**: 7, 10; **surrender**: A                 |
 | 18          | **stand**: A                                       |
 
 **Soft totals**
 
-| Player hand | Eligible dealer upcards, grouped by correct action            |
+| Player hand | Retained dealer upcards, grouped by correct action            |
 | ----------- | ------------------------------------------------------------- |
 | A,2         | **hit**: 4, 7; **double**: 5, 6                               |
 | A,3         | **hit**: 4, 7; **double**: 5, 6                               |
@@ -377,23 +379,23 @@ Each row lists the dealer upcards that make that player hand an edge case, group
 
 **Pairs (dealer-upcard and player-row neighbors)**
 
-| Player pair | Eligible dealer upcards, grouped by correct action  |
+| Player hand | Retained dealer upcards, grouped by correct action  |
 | ----------- | --------------------------------------------------- |
 | 2,2         | **split**: 7; **hit**: 8                            |
 | 3,3         | **split**: 2, 3, 4, 7; **hit**: 8                   |
 | 4,4         | **hit**: 2, 3, 4, 7, 8, 9; **split**: 5, 6          |
-| 5,5         | **double**: 2, 3, 4, 5, 6, 7, 8, 9; **hit**: 10     |
+| 5,5         | **double**: 6, 9; **hit**: 10                       |
 | 6,6         | **split**: 2, 3, 4, 5, 6; **hit**: 7, 8, 9          |
 | 7,7         | **split**: 7; **hit**: 8, 9, 10, A                  |
-| 8,8         | **split**: 7, 8, 9, 10; **surrender**: A            |
+| 8,8         | **split**: 7, 10; **surrender**: A                  |
 | 9,9         | **split**: 2, 3, 4, 5, 6, 8, 9; **stand**: 7, 10, A |
-| 10,10       | **stand**: All                                      |
-| A,A         | **split**: All                                      |
+| 10,10       | **stand**: 6                                        |
+| A,A         | **split**: 6                                        |
 
 ## Important consequences for difficulty
 
-- Under S17, hard 8 against 6 qualifies: it is hit, while hard 9 against 6 is double. A boundary filter therefore includes some straightforward decisions.
-- Under H17 with late surrender, hard 16 against Ace does not qualify in the non-pair hard-total grid. Its available neighbors (15 against Ace, 17 against Ace, and 16 against 10) all say surrender.
-- A,A and ten-valued pairs qualify against every dealer upcard because their adjacent player rows prescribe different actions: split for Aces and stand for tens.
-- Under H17 with late surrender, 8,8 against Ace is surrender. Pair eligibility also considers the actions for neighboring 7,7 and 9,9 hands.
-- Normal uses the full initial-decision pool. Tricky gives each eligible chart cell an equal chance, regardless of how often it would occur in random deals. Both continue indefinitely. The pool is derived from the same strategy function used for grading in `src/features/basic-strategy/model/difficultHands.ts`.
+- A,A and ten-valued pairs each retain one reminder against dealer 6 rather than ten repetitive cells.
+- Hard 8 retains the dealer 6 example. Hard 11 retains its S17 boundary against 10/Ace; H17 needs only a representative double.
+- Under H17 with late surrender, hard 17 and 8,8 retain the Ace surrender exception and the adjacent dealer 10 decision.
+- Under H17 with late surrender, hard 16 against Ace still does not qualify: its available neighbors all prescribe surrender.
+- Normal uses the full initial-decision pool. Tricky gives each retained cell equal probability, including when filtering to one hand family. Both continue indefinitely. The pool is derived from the same strategy function used for grading in `src/features/basic-strategy/model/difficultHands.ts`.

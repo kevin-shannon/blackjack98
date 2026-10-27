@@ -11,6 +11,7 @@ import './styles/cards.css';
 import './styles/wagers.css';
 import './styles/dialogs.css';
 import './styles/strategy-chart.css';
+import './styles/running-count.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

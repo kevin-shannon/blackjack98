@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export function ClassicSelect<T extends string>({
   id,
@@ -16,6 +17,7 @@ export function ClassicSelect<T extends string>({
   onChange: (value: T) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const listId = `${id}-list`;
@@ -24,11 +26,57 @@ export function ClassicSelect<T extends string>({
   useEffect(() => {
     if (!open) return;
     const dismiss = (event: PointerEvent) => {
-      if (!ref.current?.contains(event.target as Node)) setOpen(false);
+      if (
+        !ref.current?.contains(event.target as Node) &&
+        !listRef.current?.contains(event.target as Node)
+      )
+        setOpen(false);
     };
     document.addEventListener('pointerdown', dismiss);
     return () => document.removeEventListener('pointerdown', dismiss);
   }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    const positionList = () => {
+      const anchor = ref.current;
+      const list = listRef.current;
+      if (!anchor || !list) return;
+      const rect = anchor.getBoundingClientRect();
+      const margin = 8;
+      const width = Math.min(rect.width, window.innerWidth - margin * 2);
+      list.style.width = `${width}px`;
+      const height = list.scrollHeight + 2;
+      const below = Math.max(0, window.innerHeight - rect.bottom - margin);
+      const above = Math.max(0, rect.top - margin);
+      const openAbove = height > below && above > below;
+      const available = openAbove ? above : below;
+      list.style.maxHeight = `${available}px`;
+      list.style.top = `${openAbove ? rect.top - Math.min(height, available) : rect.bottom}px`;
+      list.style.left = `${Math.max(margin, Math.min(rect.left, window.innerWidth - width - margin))}px`;
+    };
+    positionList();
+    window.addEventListener('resize', positionList);
+    document.addEventListener('scroll', positionList, true);
+    return () => {
+      window.removeEventListener('resize', positionList);
+      document.removeEventListener('scroll', positionList, true);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const list = listRef.current;
+    const option = list?.children[active] as HTMLElement | undefined;
+    if (!list || !option) return;
+    if (option.offsetTop < list.scrollTop) list.scrollTop = option.offsetTop;
+    else if (
+      option.offsetTop + option.offsetHeight >
+      list.scrollTop + list.clientHeight
+    )
+      list.scrollTop =
+        option.offsetTop + option.offsetHeight - list.clientHeight;
+  }, [open, active]);
 
   function choose(index: number) {
     onChange(options[index]);
@@ -126,29 +174,33 @@ export function ClassicSelect<T extends string>({
         <span className="classic-select-value">{getLabel(value)}</span>
         <span className="classic-select-arrow" aria-hidden="true" />
       </button>
-      {open && (
-        <div
-          id={listId}
-          className="classic-select-list"
-          role="listbox"
-          aria-label={label}
-        >
-          {options.map((option, index) => (
-            <div
-              key={option}
-              id={`${id}-option-${index}`}
-              role="option"
-              aria-selected={option === value}
-              className={`classic-select-option${index === active ? ' active' : ''}`}
-              onMouseDown={(event) => event.preventDefault()}
-              onMouseMove={() => setActive(index)}
-              onClick={() => choose(index)}
-            >
-              {getLabel(option)}
-            </div>
-          ))}
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div
+            ref={listRef}
+            id={listId}
+            className="classic-select-list"
+            role="listbox"
+            aria-label={label}
+          >
+            {options.map((option, index) => (
+              <div
+                key={option}
+                id={`${id}-option-${index}`}
+                role="option"
+                aria-selected={option === value}
+                className={`classic-select-option${index === active ? ' active' : ''}`}
+                onMouseDown={(event) => event.preventDefault()}
+                onMouseMove={() => setActive(index)}
+                onClick={() => choose(index)}
+              >
+                {getLabel(option)}
+              </div>
+            ))}
+          </div>,
+          // Keep the list inside the accessible dialog, outside its scrolling fields.
+          ref.current?.closest('.modal') ?? document.body,
+        )}
     </div>
   );
 }

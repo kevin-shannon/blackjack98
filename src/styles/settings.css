@@ -78,17 +78,21 @@
   box-shadow: none;
 }
 .classic-select-list {
-  position: absolute;
+  position: fixed;
   z-index: 10;
-  top: 100%;
-  left: 0;
-  right: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1px;
   border: 1px solid #000;
   border-radius: 0;
   background: #fff;
   color: #000;
   box-shadow: none;
+  font:
+    12px Tahoma,
+    Arial,
+    sans-serif;
+  text-align: left;
 }
 .classic-select-option {
   padding: 3px 5px;

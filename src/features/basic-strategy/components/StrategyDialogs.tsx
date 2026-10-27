@@ -130,7 +130,9 @@ export function StrategyDialogs() {
           <li>
             Tricky randomly picks hand/upcard combinations where a neighboring
             player row or dealer upcard changes the correct action. Pairs also
-            compare adjacent pair ranks. The pool follows your table rules, with
+            compare adjacent pair ranks. Repetitive rows such as A,A and hard 11
+            have fewer examples, while dealer-upcard action changes and rule
+            exceptions stay in the pool. The pool follows your table rules, with
             repeats allowed.
           </li>
           <li>

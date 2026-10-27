@@ -9,12 +9,16 @@ export function PlayerHand({
   only,
   active,
   lastDealtId,
+  showWager = true,
+  playerName = 'Your hand',
 }: {
   hand: Hand;
   index: number;
   only: boolean;
   active: boolean;
   lastDealtId: number | null;
+  showWager?: boolean;
+  playerName?: string;
 }) {
   const total = score(hand.cards).total;
   const profit = hand.payout - hand.bet;
@@ -25,7 +29,7 @@ export function PlayerHand({
       style={{ '--card-count': hand.cards.length } as CSSProperties}
     >
       <div className="seat-label">
-        {only ? 'Your hand' : `Hand ${index + 1}`}{' '}
+        {only ? playerName : `Hand ${index + 1}`}{' '}
         <span className="score-pill">{total || '—'}</span>
       </div>
       <div className="cards stacked-cards">
@@ -40,7 +44,10 @@ export function PlayerHand({
         ))}
       </div>
       <div className="hand-under">
-        {hand.result ? (
+        {!showWager ? (
+          hand.result ||
+          (hand.complete ? (hand.status === 'bust' ? 'BUST' : 'STAND') : '')
+        ) : hand.result ? (
           <>
             <b
               className={

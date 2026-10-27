@@ -73,6 +73,14 @@ src/
         questions.ts           Rule-specific threshold and adjacent-count deals
         createDeviationTrainer.ts  Grading and independent session adapter
         settings.ts            Separate validated preference storage
+    running-count/
+      RunningCount.tsx         Running count, deck estimation, and true-count tests
+      components/              Shared count checks, discard tray, settings, and help
+      model/
+        createRunningCountTrainer.ts  Pausable six-deck playback and count grading
+        settings.ts            Independent validated count-practice preferences
+        questions.ts           Half-deck estimates and true-count division
+        *.test.ts              Exposed-card counting, autoplay, and pause checks
     training/
       components/DecisionPractice.tsx  Shared decision table, actions, and counters
       model/createDecisionTrainer.ts  Shared timers, feedback, and session lifecycle
@@ -93,6 +101,8 @@ tests/browser/
   free-play.spec.ts            Browser workflows and optional legacy captures
   basic-strategy.spec.ts       Practice, timers, preferences, and mode isolation
   deviations.spec.ts           Count boundaries, insurance, surrender, and mode isolation
+  running-count.spec.ts        Automatic play, count questions, menus, and mobile layouts
+  counting-tests.spec.ts       Deck estimates, true-count math, and test selection
   practice-review.spec.ts      Manual mistake review, skip preference, and card visibility
 ```
 
@@ -117,7 +127,7 @@ Choose Basic Strategy from the main menu, set DAS, H17, late surrender, difficul
 
 Both drill modes offer Skip explanations, off by default, in setup and Options. Enable it to hide mistake explanations and advance after the same short feedback delay. The preference is saved separately for each mode. The explanation window is centered over the felt between the dealer and player areas on desktop and mobile, keeping cards unobscured. Feedback uses the highlighted answer buttons and explanation window, without a status box. Opening the menu preserves a pending review; Next hand continues it. Selecting a different mode discards the previous run, including pending reviews.
 
-With Hand type set to All, Normal gives every physical card a 1/52 chance on each draw, with replacement; ten-valued ranks retain their natural combined probability of 4/13. Naturals are skipped because they have no initial decision. Tricky samples uniformly from the [rule-specific edge-case cells](docs/basic-strategy-edge-cases.md), with replacement, then varies the card composition, order, suits, and ten-valued ranks. A cell qualifies if its correct action differs from an immediately adjacent dealer upcard or player total within the same hand family. Pairs compare both dealer upcards and adjacent pair ranks (2,2 through A,A). Both difficulties continue indefinitely.
+With Hand type set to All, Normal gives every physical card a 1/52 chance on each draw, with replacement; ten-valued ranks retain their natural combined probability of 4/13. Naturals are skipped because they have no initial decision. Tricky samples uniformly from the [rule-specific edge-case cells](docs/basic-strategy-edge-cases.md), with replacement, then varies the card composition, order, suits, and ten-valued ranks. A cell qualifies if its correct action differs from an immediately adjacent dealer upcard or player total within the same hand family. Pairs compare both dealer upcards and adjacent pair ranks (2,2 through A,A). To reduce repetition, hard 8/11/17 and pairs of Aces/8s/5s/tens retain dealer-upcard action boundaries plus one eligible example per action (preferring dealer 6). Rule-specific exceptions are preserved. Both difficulties continue indefinitely.
 
 Hand type offers Hard, Soft, Pairs, and All (default) in setup and Options. Pairs include A,A and mixed ten-valued ranks; Hard and Soft exclude pairs. Normal preserves the random card distribution conditional on the selected type, and Tricky samples uniformly from matching edge cells. Applying a hand-type change deals a fresh question while preserving accuracy; Cancel discards pending changes. The selection is saved separately from other modes.
 
@@ -136,6 +146,24 @@ Choose H17 or S17 and practice the Illustrious 18, Fab 4, or both. Each question
 Indices use the six-deck, dealer-peek convention documented in [the deviation reference](docs/deviations.md), with doubling on any initial two cards. Player card compositions, order, ten-valued ranks, and suits vary without changing the decision being tested. Insurance is included in the 18 and uses Take insurance / Decline insurance actions, including I/N shortcuts. Other hands use H/S/D/P and R when surrender applies. The index is revealed only in mistake explanations.
 
 Illustrious 18 questions explicitly assume no surrender; Fab 4 questions explicitly offer late surrender. This avoids conflicting answers on overlapping hands such as 15 vs 10. Deviations has its own `DeviationsStats` and `blackjack98-deviations-v1` preferences. Timed questions and menus behave like Basic Strategy. Changing table rules or the practice set resets the Deviations session. Switching modes discards the current run while retaining each mode's saved preferences. The shared practice screen and lifecycle live in `features/training`, while index data, dealing, grading, and settings remain in `features/deviations`.
+
+## Counting
+
+Counting appears under Train between Basic Strategy and Deviations. Its Test dropdown selects Running Count, Deck Estimation, or True Count. Running Count remains the default for existing preferences. Applying a test change starts a fresh session, keeping accuracy specific to that test; Cancel discards pending changes.
+
+Running Count plays blackjack rounds automatically while you maintain a Hi-Lo running count: 2–6 add one, 7–9 are neutral, and ten-valued cards and Aces subtract one. Dealer hole cards enter the count only when revealed, and moved split cards are never counted twice. A new shoe visibly announces a reset to zero; the count otherwise carries across rounds.
+
+The six-deck shoe is shuffled at 75% penetration between rounds. The dealer stands on soft 17; the player follows the same basic-strategy recommendations used elsewhere, with double after split, up to four hands, and one card per split Ace. RSA, surrender, wagers, and insurance are not part of this observer mode.
+
+For Running Count, setup and Options offer a Pace slider (2 seconds to 150 milliseconds between cards/actions, faster to the right) and an Ask for count every slider (1–10 completed rounds). Defaults are 800 milliseconds and every three rounds. After the opening deal, a player decision gets a fixed two-second pause regardless of pace. The game pauses for each count question.
+
+Deck Estimation is a standalone visual drill showing used cards in a discard tray for a six-deck game. Estimate the discards and subtract from six to answer decks remaining, in half-deck steps from 0.5 through 6. Feedback shows the subtraction. Exact card counts, percentage progress bars, and answer-bearing tooltips are omitted. True Count supplies an integer running count from −24 through +24 and a half-deck value from 0.5 through 6 for mental division. Answers truncate toward zero by dropping the fractional part, explicitly stated on the question and in feedback (for example, −5 ÷ 2 becomes −2).
+
+All three tests continue indefinitely. Correct answers advance automatically after 1.1 seconds; mistakes show the expected answer and wait for Continue. Accuracy and streaks belong to this mode's own `RunningCountStats` and reset when changing tests.
+
+True Count awards partial credit based on distance from the truncated answer: exact = 100%, off by one count = 90%, off by two = 80%, down to 0%. Session accuracy is the mean of those answer scores; its footer shows answers attempted and exact-answer streaks. Running Count and Deck Estimation retain exact-answer accuracy.
+
+Pause and all menus freeze playback without hiding or skipping cards. Settings follow OK/Cancel/Apply; pace and frequency changes preserve the current count and session. New Session clears the stats and restarts the selected test, while switching modes discards the run. Preferences, including the selected test, use `blackjack98-running-count-v1`, independently of Free Play, Basic Strategy, and Deviations. Session results remain in memory.
 
 ## Adding features later
 
